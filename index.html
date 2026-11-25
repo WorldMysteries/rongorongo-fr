@@ -1,0 +1,3645 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOHAU RONGORONGO — Laboratoire numérique de l’écriture Rapa Nui</title>
+  <style>
+    :root {
+      --bg-deep: #0e0b09;
+      --bg-panel: #181310;
+      --bg-card: #211a15;
+      --bg-elevated: #2b221b;
+      --border-subtle: rgba(226, 185, 138, 0.14);
+      --border-strong: rgba(226, 185, 138, 0.32);
+      --text-main: #f4ead7;
+      --text-muted: #b7a48c;
+      --text-dim: #85735e;
+      --accent-ochre: #df6d35;
+      --accent-ochre-hover: #ee8049;
+      --accent-amber: #e8ab4c;
+      --accent-lagoon: #4eb5a6;
+      --accent-crimson: #c94f4f;
+
+      /* Dynamic Raking Light (RTI) variables */
+      --lx: 1.4px;
+      --ly: 1.8px;
+      --nlx: -1.1px;
+      --nly: -1.4px;
+
+      /* Wood Species Palette (Default: Toromiro) */
+      --wood-base: #5b2e17;
+      --wood-mid: #6e391d;
+      --wood-dark: #381a0b;
+      --wood-flute: rgba(24, 10, 4, 0.46);
+      --wood-ridge: rgba(255, 206, 155, 0.13);
+      --glyph-stroke: #f3dcc0;
+      --glyph-shadow: rgba(12, 4, 1, 0.92);
+      --glyph-highlight: rgba(255, 224, 182, 0.36);
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --font-serif: "Georgia", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "Fira Mono", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.55;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(223, 109, 53, 0.09), transparent 42%),
+        radial-gradient(circle at 84% 22%, rgba(78, 181, 166, 0.06), transparent 40%),
+        linear-gradient(180deg, #0d0a08 0%, #130f0c 50%, #0c0907 100%);
+      overflow-x: hidden;
+    }
+
+    /* Decorative Rapa Nui Geometric Pattern Strip */
+    .rapa-frieze {
+      height: 8px;
+      width: 100%;
+      background-image: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 10px,
+        rgba(223, 109, 53, 0.45) 10px,
+        rgba(223, 109, 53, 0.45) 14px,
+        transparent 14px,
+        transparent 18px,
+        rgba(232, 171, 76, 0.32) 18px,
+        rgba(232, 171, 76, 0.32) 26px
+      );
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Top Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(14, 11, 9, 0.86);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .header-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-emblem {
+      width: 44px;
+      height: 44px;
+      border-radius: 11px;
+      background: linear-gradient(145deg, #6b361b, #3a1b0b);
+      border: 1px solid rgba(232, 171, 76, 0.4);
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 1px 1px rgba(255, 224, 185, 0.25), 0 4px 14px rgba(0, 0, 0, 0.45);
+      flex-shrink: 0;
+    }
+
+    .brand-emblem svg {
+      width: 30px;
+      height: 36px;
+      stroke: #f5dfc3;
+      stroke-width: 3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-kicker {
+      font-size: 10.5px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-amber);
+      font-weight: 600;
+    }
+
+    .brand-name {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link, footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13.5px;
+      padding: 7px 13px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover, footer a:hover {
+      color: var(--text-main);
+      background: rgba(255, 235, 205, 0.05);
+      border-color: var(--border-subtle);
+    }
+
+    .header-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Buttons & Inputs */
+    button, .btn {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+      user-select: none;
+    }
+
+    button:hover {
+      background: #362a21;
+      border-color: var(--border-strong);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #e2743c 0%, #c45721 100%);
+      border-color: rgba(255, 206, 168, 0.38);
+      color: #fffaf3;
+      box-shadow: 0 3px 12px rgba(223, 109, 53, 0.28);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(180deg, #ee8149 0%, #d1622b 100%);
+      border-color: rgba(255, 224, 196, 0.6);
+    }
+
+    .btn-amber {
+      background: rgba(232, 171, 76, 0.14);
+      border-color: rgba(232, 171, 76, 0.42);
+      color: #f9d89c;
+    }
+
+    .btn-amber:hover {
+      background: rgba(232, 171, 76, 0.24);
+    }
+
+    .btn-lagoon {
+      background: rgba(78, 181, 166, 0.14);
+      border-color: rgba(78, 181, 166, 0.42);
+      color: #9be7dc;
+    }
+
+    .btn-lagoon.active, .btn-amber.active {
+      box-shadow: 0 0 0 2px rgba(232, 171, 76, 0.28);
+    }
+
+    .btn-danger {
+      color: #f29d9d;
+      border-color: rgba(201, 79, 79, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(201, 79, 79, 0.18);
+      border-color: rgba(201, 79, 79, 0.55);
+    }
+
+    select, input[type="text"] {
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--text-main);
+      background: #14100d;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: var(--accent-amber);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 28px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 44px;
+    }
+
+    /* Intro Banner */
+    .hero-banner {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 24px;
+      padding: 26px 30px;
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at 92% 15%, rgba(232, 171, 76, 0.12), transparent 52%),
+        linear-gradient(135deg, rgba(35, 27, 21, 0.95), rgba(22, 17, 14, 0.96));
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42);
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent-lagoon);
+      background: rgba(78, 181, 166, 0.1);
+      border: 1px solid rgba(78, 181, 166, 0.28);
+      padding: 4px 11px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(26px, 3.3vw, 40px);
+      line-height: 1.18;
+      margin-bottom: 12px;
+      color: #fbf2e3;
+    }
+
+    .hero-lead {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 74ch;
+    }
+
+    .hero-facts {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      align-content: center;
+    }
+
+    .fact-box {
+      background: rgba(14, 11, 9, 0.58);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+    }
+
+    .fact-num {
+      font-family: var(--font-serif);
+      font-size: 23px;
+      font-weight: 700;
+      color: var(--accent-amber);
+      line-height: 1.1;
+    }
+
+    .fact-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Section Headers */
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .section-kicker {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-ochre);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(22px, 2.4vw, 30px);
+      color: var(--text-main);
+    }
+
+    .section-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 68ch;
+    }
+
+    /* Panel Wrapper */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
+    }
+
+    /* Tablet Studio Controls */
+    .studio-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-right: 2px;
+    }
+
+    .light-slider-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #130f0c;
+      border: 1px solid var(--border-subtle);
+      padding: 6px 11px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    input[type="range"] {
+      accent-color: var(--accent-amber);
+      width: 92px;
+      cursor: pointer;
+    }
+
+    /* Wooden Kohau Tablet Stage */
+    .kohau-stage {
+      position: relative;
+      padding: 28px 18px;
+      border-radius: var(--radius-md);
+      background:
+        radial-gradient(ellipse at center, rgba(46, 33, 24, 0.55) 0%, rgba(12, 9, 7, 0.92) 85%);
+      border: 1px solid rgba(255, 224, 185, 0.08);
+      perspective: 1400px;
+      overflow: hidden;
+    }
+
+    .orientation-badge {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      z-index: 10;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(14, 11, 9, 0.78);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-amber);
+      pointer-events: none;
+    }
+
+    .kohau-wood {
+      position: relative;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 26px 34px;
+      border-radius: 42px 58px 46px 54px / 28px 34px 30px 32px;
+      background:
+        linear-gradient(180deg, rgba(255, 214, 168, 0.08) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.38) 100%),
+        linear-gradient(92deg, var(--wood-dark) 0%, var(--wood-base) 14%, var(--wood-mid) 52%, var(--wood-base) 86%, var(--wood-dark) 100%);
+      box-shadow:
+        inset 0 2px 3px rgba(255, 225, 185, 0.22),
+        inset 0 -6px 14px rgba(10, 4, 1, 0.72),
+        0 22px 48px rgba(0, 0, 0, 0.78);
+      border: 1.5px solid rgba(255, 208, 158, 0.18);
+      transition: transform 0.78s cubic-bezier(0.34, 1.18, 0.64, 1), background 0.35s ease;
+      transform-style: preserve-3d;
+    }
+
+    /* Subtle SVG procedural woodgrain overlay */
+    .kohau-wood::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0.22;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(
+        1.2deg,
+        rgba(18, 7, 2, 0.0) 0px,
+        rgba(18, 7, 2, 0.34) 2px,
+        rgba(255, 212, 170, 0.06) 4px,
+        rgba(18, 7, 2, 0.0) 9px
+      );
+      mix-blend-mode: multiply;
+    }
+
+    /* Authentic Kohau Lashing Hole on Left Tip */
+    .kohau-notch {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #0e0b09;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.95), 0 1px 1px rgba(255, 220, 180, 0.24);
+      pointer-events: none;
+    }
+
+    .kohau-wood.rotated-180 {
+      transform: rotate(180deg);
+    }
+
+    .kohau-rows {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* Carved Fluted Channel (Канелюра) */
+    .kohau-row {
+      position: relative;
+      min-height: 76px;
+      padding: 7px 14px 7px 54px;
+      border-radius: 14px;
+      background: linear-gradient(
+        180deg,
+        rgba(10, 4, 1, 0.52) 0%,
+        var(--wood-flute) 45%,
+        rgba(255, 214, 168, 0.06) 100%
+      );
+      border-top: 1px solid rgba(10, 4, 1, 0.65);
+      border-bottom: 1px solid var(--wood-ridge);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      transition: background 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .kohau-row.active-reading-row {
+      box-shadow: inset 0 0 0 1.5px rgba(232, 171, 76, 0.55);
+      background: linear-gradient(180deg, rgba(232, 171, 76, 0.12), rgba(20, 8, 2, 0.45));
+    }
+
+    .row-meta {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: rgba(244, 224, 198, 0.58);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.2;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .row-glyphs {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 3px;
+      width: 100%;
+      transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* Reverse Boustrophedon row inversion! */
+    .kohau-row.boustro-inverted .row-glyphs {
+      transform: rotate(180deg);
+    }
+
+    .carved-glyph {
+      width: 48px;
+      height: 60px;
+      padding: 3px;
+      border-radius: 7px;
+      cursor: pointer;
+      position: relative;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .carved-glyph:hover {
+      background: rgba(255, 232, 198, 0.11);
+      transform: scale(1.08);
+    }
+
+    .carved-glyph.selected {
+      background: rgba(223, 109, 53, 0.26);
+      box-shadow: inset 0 0 0 1.5px rgba(248, 188, 112, 0.85);
+    }
+
+    .carved-glyph.chanter-focus {
+      background: rgba(78, 181, 166, 0.28);
+      box-shadow: 0 0 16px rgba(78, 181, 166, 0.55), inset 0 0 0 1.5px #8ef3e4;
+      transform: scale(1.13);
+      z-index: 4;
+    }
+
+    .carved-glyph svg, .glyph-preview-svg {
+      width: 100%;
+      height: 100%;
+      stroke: var(--glyph-stroke);
+      stroke-width: 3.15;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter:
+        drop-shadow(var(--nlx) var(--nly) 0.6px var(--glyph-shadow))
+        drop-shadow(var(--lx) var(--ly) 0.4px var(--glyph-highlight));
+    }
+
+    /* Chanter Status & Selected Sign Inspector */
+    .inspector-strip {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 16px;
+    }
+
+    .inspector-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 15px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .inspector-glyph-box {
+      width: 66px;
+      height: 82px;
+      border-radius: 11px;
+      background: linear-gradient(145deg, var(--wood-mid), var(--wood-dark));
+      border: 1px solid var(--border-strong);
+      padding: 7px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .inspector-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .inspector-code {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--accent-amber);
+      background: rgba(232, 171, 76, 0.13);
+      padding: 2px 8px;
+      border-radius: 5px;
+      margin-right: 6px;
+    }
+
+    .inspector-title {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .inspector-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Phrase-to-Rongorongo Transcriber */
+    .transcriber-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 15px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .transcriber-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .transcriber-row input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sample-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      font-size: 11.5px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255, 232, 200, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .chip:hover {
+      color: var(--text-main);
+      border-color: var(--accent-amber);
+    }
+
+    .transcribe-log {
+      font-size: 11.5px;
+      color: var(--accent-lagoon);
+      font-family: var(--font-mono);
+      min-height: 17px;
+    }
+
+    /* Section 2: Barthel Catalog + Ligature Builder */
+    .catalog-layout {
+      display: grid;
+      grid-template-columns: 1.5fr 0.85fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cat-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .cat-pill {
+      font-size: 12.5px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .cat-pill.active {
+      background: var(--accent-ochre);
+      border-color: rgba(255, 225, 198, 0.5);
+      color: #fff;
+    }
+
+    .glyph-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+      gap: 10px;
+      max-height: 620px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .glyph-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: border-color 0.18s ease, transform 0.15s ease, background 0.18s ease;
+    }
+
+    .glyph-card:hover {
+      border-color: var(--accent-amber);
+      background: #292019;
+      transform: translateY(-2px);
+    }
+
+    .glyph-card-top {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+    }
+
+    .glyph-card-art {
+      width: 52px;
+      height: 64px;
+      padding: 4px;
+      border-radius: 8px;
+      background: rgba(14, 9, 6, 0.55);
+    }
+
+    .glyph-card-rapa {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--text-main);
+    }
+
+    .glyph-card-ru {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.25;
+    }
+
+    /* Ligature Composer */
+    .ligature-box {
+      position: sticky;
+      top: 84px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .ligature-stage {
+      height: 200px;
+      border-radius: var(--radius-md);
+      background:
+        radial-gradient(circle at 50% 42%, var(--wood-mid), var(--wood-dark));
+      border: 1px solid var(--border-strong);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .ligature-stage svg {
+      width: 108px;
+      height: 135px;
+    }
+
+    .ligature-code-tag {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: rgba(12, 9, 7, 0.76);
+      padding: 3px 9px;
+      border-radius: 6px;
+      color: var(--accent-amber);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .field-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field-stack label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Section 3: Obsidian Carving Canvas */
+    .carver-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .scratchpad-wrap {
+      position: relative;
+      width: 320px;
+      height: 400px;
+      margin: 0 auto;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 2px solid rgba(232, 171, 76, 0.34);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.65);
+      touch-action: none;
+    }
+
+    #obsidianCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    .carver-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tool-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 13px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .tool-card.active {
+      border-color: var(--accent-ochre);
+      background: rgba(223, 109, 53, 0.13);
+    }
+
+    .tool-card h4 {
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+
+    .tool-card p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Section 4: Decipherment, Kunstkamera Parallels & Live Stats */
+    .science-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 14px;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-elevated);
+      border-color: var(--accent-amber);
+      color: var(--text-main);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Mamari Lunar Strip */
+    .mamari-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .lunar-cell {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .lunar-cell:hover, .lunar-cell.active {
+      border-color: var(--accent-amber);
+      background: rgba(232, 171, 76, 0.14);
+    }
+
+    .lunar-cell svg {
+      width: 40px;
+      height: 50px;
+    }
+
+    .lunar-night {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-amber);
+    }
+
+    .lunar-name {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Kudryavtsev Kunstkamera Parallel Matrix */
+    .parallel-matrix {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .parallel-row {
+      display: grid;
+      grid-template-columns: 150px repeat(8, minmax(56px, 1fr));
+      gap: 6px;
+      align-items: center;
+      min-width: 640px;
+    }
+
+    .parallel-tablet-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      background: var(--bg-card);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .parallel-tablet-label span {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .parallel-slot {
+      height: 64px;
+      background: linear-gradient(180deg, #4d2714, #2f170b);
+      border: 1px solid rgba(232, 171, 76, 0.2);
+      border-radius: 8px;
+      padding: 5px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.16s ease;
+    }
+
+    .parallel-slot.highlight {
+      border-color: var(--accent-lagoon);
+      box-shadow: 0 0 0 2px rgba(78, 181, 166, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .scholar-note {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(78, 181, 166, 0.08);
+      border-left: 3px solid var(--accent-lagoon);
+      font-size: 13.5px;
+      color: var(--text-main);
+    }
+
+    /* Live Statistics Panel */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .stat-mini {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-mini strong {
+      display: block;
+      font-family: var(--font-serif);
+      font-size: 21px;
+      color: var(--accent-amber);
+    }
+
+    .stat-mini span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .freq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .freq-item {
+      display: grid;
+      grid-template-columns: 58px 1fr 34px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .freq-bar-bg {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+    }
+
+    .freq-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-ochre), var(--accent-amber));
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 26px 24px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12.5px;
+    }
+
+    @media (max-width: 1040px) {
+      .hero-banner,
+      .inspector-strip,
+      .catalog-layout,
+      .carver-layout,
+      .science-grid {
+        grid-template-columns: 1fr;
+      }
+      .ligature-box {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .kohau-wood {
+        padding: 18px 14px;
+      }
+      .kohau-row {
+        padding-left: 42px;
+      }
+      .carved-glyph {
+        width: 40px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="rapa-frieze"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#top" class="brand">
+        <div class="brand-emblem" aria-hidden="true">
+          <svg viewBox="0 0 64 80">
+            <path d="M24 19 C22 13 27 9 34 10 L53 13 C56 14 56 18 52 19 L36 18 C35 22 32 25 27 25" />
+            <path d="M24 19 C15 28 14 45 20 56 C24 62 31 62 34 55 C36 45 35 34 32 25" />
+            <path d="M31 58 L43 56 L45 69 L52 69 M23 59 L19 70 L25 71" />
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <span class="brand-kicker">Kohau Rongorongo · Rapa Nui</span>
+          <span class="brand-name">Laboratoire Rongo-Rongo</span>
+        </div>
+      </a>
+
+      <nav class="main-nav" aria-label="Sections">
+        <a href="#studio" class="nav-link">Tablette Kohau</a>
+        <a href="#catalog" class="nav-link">Catalogue de Barthel et Ligatures</a>
+        <a href="#carver" class="nav-link">Gravure Mata'a</a>
+        <a href="#decipher" class="nav-link">Kunstkamera et Déchiffrement</a>
+      </nav>
+
+      <div class="header-tools">
+        <button id="soundToggleBtn" type="button" class="btn-amber" title="Son du burin sur le bois (Web Audio API)">
+          Son du burin : Activé
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div>
+        <div class="hero-tag">Monument non déchiffré de l’Océanie · HTML + CSS + JS pur</div>
+        <h1 class="hero-title">Les « tablettes parlantes » de l’île de Pâques : gravure, boustrophédon inverse et épigraphie</h1>
+        <p class="hero-lead">
+          Le <strong>kohau rongorongo</strong> est un système d’écriture polynésien original et unique, gravé au moyen d’éclats d’obsidienne <em>mata'a</em> et d’une dent de requin sur des tablettes cannelées en bois de <em>toromiro</em>. Les tablettes se lisent selon la méthode du <strong>boustrophédon inverse</strong> : arrivé au bord droit d’une ligne, le prêtre <em>tangata-rongorongo</em> retournait la tablette à 180°.
+        </p>
+      </div>
+      <div class="hero-facts">
+        <div class="fact-box">
+          <div class="fact-num">26</div>
+          <div class="fact-label">artefacts authentiques en bois conservés dans les musées du monde</div>
+        </div>
+        <div class="fact-box">
+          <div class="fact-num">~14 000</div>
+          <div class="fact-label">glyphes dans le corpus (dont 2 tablettes à la Kunstkamera de Saint-Pétersbourg)</div>
+        </div>
+        <div class="fact-box">
+          <div class="fact-num">180°</div>
+          <div class="fact-label">rotation de la tablette à la fin de chaque canalure (boustrophédon inverse)</div>
+        </div>
+        <div class="fact-box">
+          <div class="fact-num">~55</div>
+          <div class="fact-label">signes de base selon K. Pozdnyakov et Yu. Knorozov, fusionnant en ligatures</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: Interactive Kohau Tablet Studio -->
+    <section id="studio">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Artefact interactif · Lumière épigraphique rasante RTI</div>
+          <h2 class="section-title">Tablette Kohau gravée et mode de lecture du prêtre</h2>
+        </div>
+        <p class="section-sub">
+          Choisissez un monument historique, tournez la tablette de 180°, modifiez l’angle d’éclairage de la gravure ou gravez votre propre message.
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="studio-toolbar">
+          <div class="toolbar-group">
+            <span class="control-label">Monument :</span>
+            <select id="presetSelect" aria-label="Choix d’un texte historique">
+              <option value="mamari">Tablette C « Mamari » — Calendrier lunaire</option>
+              <option value="kunstkamera">Chaîne parallèle de Koudriavtsev — Kunstkamera (P/Q)</option>
+              <option value="santiago">Bâton de Santiago (I) — Triades cosmogoniques</option>
+              <option value="tahua">Tablette A « Tahua » — Chant de Hotu Matua</option>
+            </select>
+
+            <span class="control-label">Essence :</span>
+            <select id="woodSelect" aria-label="Essence de bois">
+              <option value="toromiro">Toromiro (Sophora toromiro)</option>
+              <option value="miro">Palissandre du Pacifique Miro</option>
+              <option value="ash">Frêne européen (rame de Tahua)</option>
+              <option value="driftwood">Bois flotté érodé par l’océan</option>
+            </select>
+          </div>
+
+          <div class="toolbar-group">
+            <button id="boustroToggleBtn" type="button" class="btn-lagoon active">
+              Boustrophédon inverse : Activé
+            </button>
+            <button id="rotateTabletBtn" type="button" class="btn-primary">
+              ↻ Tourner la tablette de 180°
+            </button>
+            <button id="chanterPlayBtn" type="button" class="btn-amber">
+              ▶ Lecture du prêtre
+            </button>
+            <button id="chanterStepBtn" type="button" title="Glyphe suivant dans l’ordre de lecture">
+              Pas →
+            </button>
+          </div>
+
+          <div class="toolbar-group">
+            <div class="light-slider-wrap" title="Lumière épigraphique rasante pour lire le relief de la gravure">
+              <span>Lumière rasante :</span>
+              <input id="lightAngleSlider" type="range" min="0" max="360" value="132" />
+              <span id="lightAngleVal">132°</span>
+            </div>
+            <button id="newRowBtn" type="button" title="Ajouter une nouvelle canalure (ligne)">+ Ligne</button>
+            <button id="backspaceBtn" type="button" title="Supprimer le glyphe sélectionné ou le dernier">⌫ Effacer</button>
+            <button id="clearTabletBtn" type="button" class="btn-danger" title="Vider la tablette">Tout effacer</button>
+            <button id="exportPngBtn" type="button" class="btn-amber">⬇ PNG</button>
+          </div>
+        </div>
+
+        <!-- Wooden Kohau Stage -->
+        <div class="kohau-stage" id="kohauStage">
+          <div class="orientation-badge" id="orientationBadge">Orientation : 0° (les lignes impaires sont droites)</div>
+          <div class="kohau-wood" id="kohauWood">
+            <div class="kohau-notch" title="Trou de fixation pour un cordon en cheveux humains ou en écorce de hau"></div>
+            <div class="kohau-rows" id="kohauRows"></div>
+          </div>
+        </div>
+
+        <!-- Inspector + Phrase Transcriber -->
+        <div class="inspector-strip">
+          <div class="inspector-card" id="glyphInspector">
+            <div class="inspector-glyph-box" id="inspectorGlyphSvg"></div>
+            <div class="inspector-details">
+              <div>
+                <span class="inspector-code" id="inspectorCode">B-040</span>
+                <span class="control-label" id="inspectorMeta">Ligne Ca1 · Position 1 · Droite</span>
+              </div>
+              <div class="inspector-title" id="inspectorTitle">Mahina / Rei Miro — Croissant lunaire</div>
+              <p class="inspector-desc" id="inspectorDesc">
+                Cliquez sur n’importe quel glyphe gravé sur la tablette ci-dessus pour étudier son code selon le catalogue de Thomas Barthel (1958), sa lecture rapanui et les hypothèses de déchiffrement.
+              </p>
+            </div>
+          </div>
+
+          <div class="transcriber-card">
+            <div class="control-label">
+              <strong>Transcripteur phonético-idéographique</strong> — saisissez une phrase en français ou en rapanui :
+            </div>
+            <div class="transcriber-row">
+              <input
+                id="phraseInput"
+                type="text"
+                placeholder="Par exemple : La frégate vole au-dessus de la pleine lune et de l’océan"
+                value="Makemake a créé le soleil la lune et la tortue"
+              />
+              <button id="transcribeBtn" type="button" class="btn-primary">Graver</button>
+            </div>
+            <div class="sample-chips">
+              <span class="chip" data-sample="Makemake a créé le soleil la lune et la tortue">Mythe de la création</span>
+              <span class="chip" data-sample="La frégate porte un poisson au chef de Rapa Nui">Chant d’Orongo</span>
+              <span class="chip" data-sample="La pluie du ciel nourrit l'arbre et le palmier">Incantation de pluie</span>
+              <span class="chip" data-sample="Hotu Matua vogue avec une pagaie vers l'île">Arrivée des ancêtres</span>
+            </div>
+            <div class="transcribe-log" id="transcribeLog">Prêt à graver : idéogrammes racines + transmission syllabique</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Barthel Catalog & Ligature Synthesis -->
+    <section id="catalog">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Catalogue de Thomas Barthel (1958) · 36 signes du corpus</div>
+          <h2 class="section-title">Palette de signes et synthèse des ligatures</h2>
+        </div>
+        <p class="section-sub">
+          Cliquez sur n’importe quel signe du catalogue pour le graver dans la canalure active de la tablette, ou composez à droite une ligature polynésienne complexe.
+        </p>
+      </div>
+
+      <div class="catalog-layout">
+        <div class="panel">
+          <div class="filter-bar">
+            <div class="cat-pills" id="catPills">
+              <button type="button" class="cat-pill active" data-cat="all">Tous (36)</button>
+              <button type="button" class="cat-pill" data-cat="anthropo">Anthropomorphes</button>
+              <button type="button" class="cat-pill" data-cat="bird">Oiseaux et Tangata Manu</button>
+              <button type="button" class="cat-pill" data-cat="fauna">Faune de l’océan</button>
+              <button type="button" class="cat-pill" data-cat="cosmos">Cosmos et flore</button>
+              <button type="button" class="cat-pill" data-cat="ideo">Sceptres et idéogrammes</button>
+            </div>
+            <input id="catalogSearch" type="text" placeholder="Recherche : 200, lune, ika..." aria-label="Recherche d’un signe" />
+          </div>
+
+          <div class="glyph-grid" id="glyphGrid"></div>
+        </div>
+
+        <!-- Ligature Builder -->
+        <div class="panel ligature-box">
+          <div>
+            <div class="section-kicker">Principe de fusion des signes</div>
+            <h3 class="section-title" style="font-size: 21px;">Constructeur de ligatures</h3>
+            <p class="section-sub" style="font-size: 12.8px; margin-top: 4px;">
+              Les scribes de Rapa Nui économisaient le précieux bois : ils remplaçaient la tête de la figure et inséraient les signes modificateurs directement dans la main levée ou l’aile.
+            </p>
+          </div>
+
+          <div class="ligature-stage">
+            <div id="ligaturePreviewWrap"></div>
+            <span class="ligature-code-tag" id="ligatureCodeTag">B-200.008+700</span>
+          </div>
+
+          <div class="field-stack">
+            <label for="ligBaseSelect">1. Corps central (base du signe) :</label>
+            <select id="ligBaseSelect">
+              <option value="001">B-001 · Personne debout (Tangata)</option>
+              <option value="200" selected>B-200 · Homme-oiseau (Tangata Manu)</option>
+              <option value="070">B-070 · Prêtre assis (Tangata Noho)</option>
+              <option value="600">B-600 · Frégate sacrée (Manu Tara)</option>
+              <option value="050">B-050 · Arbre du monde (Tumu)</option>
+            </select>
+          </div>
+
+          <div class="field-stack">
+            <label for="ligHeadSelect">2. Modificateur de cime / de tête :</label>
+            <select id="ligHeadSelect">
+              <option value="none">Sans remplacement de la cime</option>
+              <option value="008" selected>B-008 · Couronne solaire (Ra'a)</option>
+              <option value="040">B-040 · Croissant lunaire (Mahina)</option>
+              <option value="240">B-240 · Masque de Makemake</option>
+              <option value="520">B-520 · Couronne de plumes (Hau Kura)</option>
+            </select>
+          </div>
+
+          <div class="field-stack">
+            <label for="ligHandSelect">3. Attribut en main / à l’aile :</label>
+            <select id="ligHandSelect">
+              <option value="none">Sans attribut</option>
+              <option value="700" selected>B-700 · Poisson sacrificiel (Ika)</option>
+              <option value="010">B-010 · Rame cérémoniel (Ao)</option>
+              <option value="034">B-034 · Hameçon en os (Mangai)</option>
+              <option value="095">B-095 · Sceptre du chef (Ua)</option>
+              <option value="901">B-901 · Bâton diviseur (Toko)</option>
+            </select>
+          </div>
+
+          <button id="insertLigatureBtn" type="button" class="btn-primary" style="width: 100%; padding: 11px;">
+            + Graver la ligature sur la tablette
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Freehand Obsidian Scratchpad -->
+    <section id="carver">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Archéologie expérimentale · Technique des deux burins</div>
+          <h2 class="section-title">Planche du graveur : gravure à l’obsidienne Mata'a et à la dent de requin</h2>
+        </div>
+        <p class="section-sub">
+          D’après les observations des chercheurs (P. Horley, I. Fiodorova), le scribe traçait d’abord le contour avec un éclat aigu de verre volcanique <em>mata'a</em>, puis élargissait et polissait le sillon avec la dent de requin <em>niho mango</em>.
+        </p>
+      </div>
+
+      <div class="panel carver-layout">
+        <div class="scratchpad-wrap">
+          <canvas id="obsidianCanvas" width="320" height="400"></canvas>
+        </div>
+
+        <div class="carver-info">
+          <div class="tool-cards" id="carverTools">
+            <div class="tool-card active" data-tool="shark">
+              <h4>Dent de requin (Niho Mango)</h4>
+              <p>Sillon calligraphique profond au chanfrein lumineux chaud sur la paroi du bois.</p>
+            </div>
+            <div class="tool-card" data-tool="obsidian">
+              <h4>Éclat d’obsidienne (Mata'a)</h4>
+              <p>Fine entaille de gravure préparatoire pour les petits détails et les plumes.</p>
+            </div>
+            <div class="tool-card" data-tool="double">
+              <h4>Double contour du scribe</h4>
+              <p>Ligne double parallèle, caractéristique des contours canoniques des corps et des croissants lunaires.</p>
+            </div>
+          </div>
+
+          <div class="toolbar-group">
+            <button id="symmetryToggleBtn" type="button" class="btn-lagoon">Axe de symétrie : Désactivé</button>
+            <button id="undoStrokeBtn" type="button">↶ Annuler le trait</button>
+            <button id="clearCanvasBtn" type="button" class="btn-danger">Nettoyer le bloc</button>
+            <button id="addCustomGlyphBtn" type="button" class="btn-primary">
+              ✦ Transférer mon glyphe sur la tablette Kohau
+            </button>
+          </div>
+
+          <div class="scholar-note" id="carverStatusNote">
+            Dessinez votre propre signe directement sur le bloc de bois à gauche, à la souris ou au doigt. Tous les traits sont numérisés en vecteur pur et, une fois transférés sur la tablette principale, tourneront selon le boustrophédon inverse au même titre que les signes classiques de Barthel !
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Decipherment Science, Kunstkamera & Live Corpus Analytics -->
+    <section id="decipher">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Science du Rongorongo · De Saint-Pétersbourg à Rapa Nui</div>
+          <h2 class="section-title">Clés du déchiffrement et statistiques en direct de la tablette</h2>
+        </div>
+      </div>
+
+      <div class="science-grid">
+        <div class="panel">
+          <div class="tab-bar" id="scienceTabs">
+            <button type="button" class="tab-btn active" data-tab="kunstkameraTab">
+              Parallèles de B. Koudriavtsev (Kunstkamera)
+            </button>
+            <button type="button" class="tab-btn" data-tab="mamariTab">
+              Calendrier lunaire « Mamari »
+            </button>
+            <button type="button" class="tab-btn" data-tab="triadsTab">
+              Triades cosmogoniques (Bâton de Santiago)
+            </button>
+          </div>
+
+          <!-- Tab 1: Kunstkamera -->
+          <div class="tab-pane active" id="kunstkameraTab">
+            <p style="font-size: 14px; color: var(--text-muted);">
+              En 1871, Miklouho-Maclay acquit deux tablettes rongorongo, aujourd’hui conservées à la <strong>Kunstkamera (MAE RAN, Saint-Pétersbourg)</strong>. En 1938, le lycéen pétersbourgeois <strong>Boris Koudriavtsev</strong> découvrit que les tablettes de Pétersbourg <strong>P</strong> et <strong>Q</strong>, ainsi que la grande tablette de Santiago <strong>H</strong>, portent un même texte sacré avec des remplacements significatifs de signes isolés par des ligatures. Cliquez sur n’importe quelle colonne ci-dessous :
+            </p>
+            <div class="parallel-matrix" id="parallelMatrix"></div>
+            <div class="scholar-note" id="parallelCommentary"></div>
+          </div>
+
+          <!-- Tab 2: Mamari Lunar Calendar -->
+          <div class="tab-pane" id="mamariTab">
+            <p style="font-size: 14px; color: var(--text-muted);">
+              Le seul fragment du rongorongo dont le sens fonctionnel soit reconnu par tous les chercheurs (T. Barthel, J. Guy) est le <strong>calendrier des nuits de la Lune</strong> de la tablette C « Mamari » (lignes Ca6–Ca9). Il énumère les 28–30 nuits du mois synodique, de la nouvelle lune <em>Ohiro</em> à la pleine lune <em>Omotohi</em>, en indiquant les nuits favorables à la pêche en haute mer. Choisissez une phase :
+            </p>
+            <div class="mamari-strip" id="mamariStrip"></div>
+            <div class="scholar-note" id="mamariCommentary"></div>
+          </div>
+
+          <!-- Tab 3: Santiago Staff Triads -->
+          <div class="tab-pane" id="triadsTab">
+            <p style="font-size: 14px; color: var(--text-muted);">
+              Le <strong>Bâton de Santiago (tablette I)</strong> compte 2 320 glyphes, séparés par le bâton vertical <code>B-901</code>. Yu. Knorozov, N. Boutinov et S. Fischer ont montré que de nombreux segments forment des <strong>triades de la création</strong> généalogiques ou cosmogoniques, selon la formule des psalmodies rapanui <em>« Timo te ako-ako »</em> : <strong>« Le progéniteur X s’est uni à Y — Z est né »</strong>.
+            </p>
+            <div id="triadsShowcase" style="display:flex; flex-direction:column; gap:10px; margin-top:14px;"></div>
+          </div>
+        </div>
+
+        <!-- Live Statistical Analyzer -->
+        <div class="panel">
+          <div class="section-kicker">Télémétrie épigraphique</div>
+          <h3 class="section-title" style="font-size: 21px; margin-bottom: 12px;">Analyse de la tablette actuelle</h3>
+
+          <div class="stats-grid">
+            <div class="stat-mini">
+              <strong id="statTotal">0</strong>
+              <span>Total des glyphes</span>
+            </div>
+            <div class="stat-mini">
+              <strong id="statUnique">0</strong>
+              <span>Uniques</span>
+            </div>
+            <div class="stat-mini">
+              <strong id="statDiversity">0%</strong>
+              <span>Indice de diversité</span>
+            </div>
+          </div>
+
+          <div class="control-label" style="margin-bottom: 8px;">Distribution fréquentielle des signes sur la tablette :</div>
+          <div class="freq-list" id="freqList"></div>
+
+          <div class="scholar-note" id="bigramReport" style="margin-top: 16px; font-size: 12.5px;">
+            Les bigrammes répétés sont mis à jour automatiquement à chaque modification du texte de la tablette.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    KOHAU RONGORONGO · Laboratoire épigraphique interactif · <a href="https://untoldarchive.com/rongorongo-old">Ancienne version du site</a>
+  </footer>
+
+  <script id="appScript">
+    (function () {
+      "use strict";
+
+      /* =====================================================================
+         1. КАТАЛОГ ЗНАКОВ ТОМАСА БАРТЕЛЯ (36 векторных глифов в поле 0 0 64 80)
+         ===================================================================== */
+      const GLYPHS = {
+        "001": {
+          code: "001",
+          cat: "anthropo",
+          rapa: "Tangata",
+          ru: "Personne debout",
+          syllables: ["ta", "na", "nga"],
+          keywords: ["homme", "gens", "peuple", "mâle", "tangata"],
+          desc: "Figure anthropomorphe de face à tête losangique et bras tombants. L’un des déterminatifs de base des êtres vivants et des ancêtres.",
+          paths: [
+            "M32 10 L40 17 L32 24 L24 17 Z",
+            "M28 24 L27 51 L20 70 L14 70 M36 24 L37 51 L44 70 L50 70",
+            "M27 29 L15 38 L15 48 M37 29 L49 38 L49 48"
+          ]
+        },
+        "002": {
+          code: "002",
+          cat: "anthropo",
+          rapa: "Tangata Haere",
+          ru: "Messager marchant",
+          syllables: ["kha", "khe", "re"],
+          keywords: ["vogue", "chemin", "messager", "pas", "naviguer", "ramer"],
+          desc: "Figure en mouvement, une main levée pour saluer ou psalmodier et l’autre main abaissée.",
+          paths: [
+            "M32 10 C38 10 40 16 36 22 C33 25 29 25 27 22 C24 16 26 10 32 10 Z",
+            "M29 24 L26 50 L18 69 L25 70 M35 24 L38 50 L45 68 L52 67",
+            "M28 29 L16 20 L16 12 M36 29 L48 40 L48 50"
+          ]
+        },
+        "004": {
+          code: "004",
+          cat: "anthropo",
+          rapa: "Enata / Tivi",
+          ru: "Tronc généalogique des ancêtres",
+          syllables: ["e", "ti", "vi"],
+          keywords: ["ancêtre", "lignée", "génération", "progéniteur"],
+          desc: "Chaîne verticale de losanges symbolisant l’épine dorsale et le fil généalogique ininterrompu des générations d’ariki.",
+          paths: [
+            "M32 9 L41 18 L32 27 L23 18 Z",
+            "M32 27 L41 39 L32 51 L23 39 Z",
+            "M32 51 L41 62 L32 72 L23 62 Z",
+            "M18 18 L23 18 M41 18 L46 18 M18 39 L23 39 M41 39 L46 39"
+          ]
+        },
+        "006": {
+          code: "006",
+          cat: "anthropo",
+          rapa: "Rima",
+          ru: "Paume du créateur",
+          syllables: ["ri", "ma", "mi"],
+          keywords: ["main", "prendre", "faire", "créé", "créer", "donner"],
+          desc: "Dessin polynésien caractéristique d’une main au pouce écarté et aux trois doigts joints.",
+          paths: [
+            "M28 69 L28 38 C28 33 21 31 17 35 C14 38 18 43 24 42",
+            "M28 38 L28 15 M34 38 L34 12 M40 39 L40 16",
+            "M40 39 L40 69 L28 69"
+          ]
+        },
+        "008": {
+          code: "008",
+          cat: "cosmos",
+          rapa: "Ra'a / Hetu'u",
+          ru: "Soleil ou étoile",
+          syllables: ["ra", "a", "khe"],
+          keywords: ["soleil", "lumière", "étoile", "jour", "feu", "raa"],
+          desc: "Rosette à six rayons au disque central. Désigne l’astre solaire Ra'a, l’étoile brillante des navigateurs ou le feu rituel.",
+          paths: [
+            "M32 32 m-8 0 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0",
+            "M32 10 L32 22 M32 42 L32 56 M13 21 L24 27 M40 37 L51 43 M51 21 L40 27 M24 37 L13 43",
+            "M32 58 L28 69 M32 58 L36 69"
+          ]
+        },
+        "009": {
+          code: "009",
+          cat: "cosmos",
+          rapa: "Rangi",
+          ru: "Voûte du ciel",
+          syllables: ["ran", "gi", "ne"],
+          keywords: ["ciel", "du ciel", "voûte", "hauteur", "nuage", "rangi"],
+          desc: "Arc horizontal du dôme céleste soutenu par des piliers, connu par le mythe polynésien de la séparation du Ciel et de la Terre.",
+          paths: [
+            "M12 28 C20 14 44 14 52 28 C44 23 20 23 12 28 Z",
+            "M18 27 L18 66 M32 25 L32 66 M46 27 L46 66",
+            "M13 66 L23 66 M27 66 L37 66 M41 66 L51 66"
+          ]
+        },
+        "010": {
+          code: "010",
+          cat: "ideo",
+          rapa: "Ao / Rapa",
+          ru: "Rame à double pale Ao",
+          syllables: ["ao", "o", "pa"],
+          keywords: ["pagaie", "rame", "danse", "pouvoir", "pirogue", "canot"],
+          desc: "Grand rame cérémoniel à double pale Ao — insigne du statut suprême lors des fêtes de Mataveri et à Orongo.",
+          paths: [
+            "M32 9 C43 13 44 27 32 33 C20 27 21 13 32 9 Z",
+            "M32 33 L32 47",
+            "M32 47 C44 53 43 67 32 71 C21 67 20 53 32 47 Z",
+            "M26 20 L30 20 M34 20 L38 20"
+          ]
+        },
+        "014": {
+          code: "014",
+          cat: "ideo",
+          rapa: "Ipu / Pahu",
+          ru: "Vase calebasse à eau",
+          syllables: ["i", "pu", "vu"],
+          keywords: ["eau", "vase", "coupe", "source", "boire"],
+          desc: "Vase arrondi en gourde ipu servant à conserver l’eau douce de pluie et le pigment colorant kiea.",
+          paths: [
+            "M26 14 L38 14 L35 24 C46 29 48 47 42 59 C38 67 26 67 22 59 C16 47 18 29 29 24 Z",
+            "M23 44 C29 48 35 48 41 44"
+          ]
+        },
+        "022": {
+          code: "022",
+          cat: "ideo",
+          rapa: "Komari",
+          ru: "Signe de fertilité Komari",
+          syllables: ["ko", "ka", "ro"],
+          keywords: ["naissance", "vie", "fertilité", "femme", "mère"],
+          desc: "L’un des pétroglyphes sacrés les plus fréquents des rochers d’Orongo et des tablettes rongorongo ; il évoque la genèse, l’abondance et la continuité de la lignée.",
+          paths: [
+            "M32 12 C45 24 45 56 32 68 C19 56 19 24 32 12 Z",
+            "M32 21 L32 59",
+            "M26 32 C23 38 23 42 26 48 M38 32 C41 38 41 42 38 48"
+          ]
+        },
+        "025": {
+          code: "025",
+          cat: "anthropo",
+          rapa: "Mata",
+          ru: "Œil omniscient Mata",
+          syllables: ["mat", "ta", "mo"],
+          keywords: ["œil", "voir", "regarder", "regard", "étoile"],
+          desc: "Œil amygdalain à pupille et rayons-cils, parent des yeux d’obsidienne et de corail des statues moaï.",
+          paths: [
+            "M11 40 C21 24 43 24 53 40 C43 56 21 56 11 40 Z",
+            "M32 40 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0",
+            "M22 25 L19 17 M32 22 L32 13 M42 25 L45 17"
+          ]
+        },
+        "028": {
+          code: "028",
+          cat: "cosmos",
+          rapa: "Henua",
+          ru: "Terre de l’île de Rapa Nui",
+          syllables: ["khe", "nu", "na"],
+          keywords: ["terre", "île", "îlot", "champ", "pierre", "rapa", "nui", "l'île"],
+          desc: "Parcelle rectangulaire de terre cultivée, aux enclos de pierre manavai intérieurs qui protégeaient les plantations du vent océanique.",
+          paths: [
+            "M18 14 L46 14 L46 66 L18 66 Z",
+            "M18 31 L46 31 M18 49 L46 49",
+            "M32 14 L32 66"
+          ]
+        },
+        "034": {
+          code: "034",
+          cat: "ideo",
+          rapa: "Mangai",
+          ru: "Hameçon de pêche Mangai",
+          syllables: ["man", "ga", "gu"],
+          keywords: ["hameçon", "pêche", "prise", "mer", "profondeur"],
+          desc: "Hameçon composite polissé mangai ivi pour la pêche au thon en haute mer. Dans le calendrier Mamari, il marque les nuits de pêche autorisées.",
+          paths: [
+            "M23 13 L23 48 C23 62 39 66 45 54 C49 46 47 34 40 28 L35 35",
+            "M19 13 L27 13 M23 20 L28 20"
+          ]
+        },
+        "040": {
+          code: "040",
+          cat: "cosmos",
+          rapa: "Mahina / Rei Miro",
+          ru: "Croissant lunaire / pectoral Rei Miro",
+          syllables: ["lu", "ma", "khi"],
+          keywords: ["lune", "mois", "nuit", "croissant", "mahina"],
+          desc: "Élégant croissant aux cornes recourbées. Signe astronomique clé du calendrier lunaire de la tablette C « Mamari ».",
+          paths: [
+            "M44 13 C20 19 18 61 44 67 C30 55 30 25 44 13 Z",
+            "M42 15 C45 14 47 16 46 19 M42 65 C45 66 47 64 46 61"
+          ]
+        },
+        "041": {
+          code: "041",
+          cat: "cosmos",
+          rapa: "Omotohi",
+          ru: "Pleine lune Omotohi",
+          syllables: ["om", "to", "khi"],
+          keywords: ["pleine", "plénilune", "disque", "cercle"],
+          desc: "Disque de la pleine Lune au noyau interne et au contour rituel — apogée de la 15e nuit du mois dans le calendrier « Mamari ».",
+          paths: [
+            "M32 40 m-20 0 a20 20 0 1 0 40 0 a20 20 0 1 0 -40 0",
+            "M32 40 m-9 0 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0",
+            "M32 13 L32 20 M32 60 L32 67"
+          ]
+        },
+        "044": {
+          code: "044",
+          cat: "ideo",
+          rapa: "Tahonga",
+          ru: "Boule sacrée Tahonga",
+          syllables: ["ta", "kho", "go"],
+          keywords: ["fruit", "cœur", "noix", "parure", "cadeau"],
+          desc: "Pendentif de bois en forme de cœur, tahonga, sculpté en mémoire des fruits du cocotier de la patrie ancestrale Hiva.",
+          paths: [
+            "M32 13 L32 22",
+            "M32 22 C47 22 50 42 32 66 C14 42 17 22 32 22 Z",
+            "M24 31 C29 36 35 36 40 31"
+          ]
+        },
+        "050": {
+          code: "050",
+          cat: "cosmos",
+          rapa: "Tumu / Miro",
+          ru: "Arbre aux branches et racines",
+          syllables: ["tu", "mu", "dr"],
+          keywords: ["arbre", "l'arbre", "forêt", "toromiro", "plante", "racine"],
+          desc: "Tronc d’arbre symétrique aux rameaux divergents. Signe du bois sacré et de la « racine » généalogique (tumu).",
+          paths: [
+            "M32 11 L32 69",
+            "M32 23 L18 14 M32 23 L46 14",
+            "M32 37 L16 28 M32 37 L48 28",
+            "M32 51 L18 43 M32 51 L46 43",
+            "M23 69 L41 69"
+          ]
+        },
+        "053": {
+          code: "053",
+          cat: "cosmos",
+          rapa: "Ua",
+          ru: "Pluie bienfaisante",
+          syllables: ["ua", "do", "zhd"],
+          keywords: ["pluie", "averse", "nuage", "nourrit", "rosée", "océan", "l'océan"],
+          desc: "Bandeau nuageux aux jets de pluie tombants et aux gouttes — symbole majeur des prières des prêtres au dieu Hiro pendant la sécheresse.",
+          paths: [
+            "M13 18 C18 11 28 11 32 16 C36 11 46 11 51 18 Z",
+            "M19 22 L19 56 M28 22 L28 64 M37 22 L37 56 M46 22 L46 64",
+            "M19 63 L19 66 M37 63 L37 66"
+          ]
+        },
+        "060": {
+          code: "060",
+          cat: "cosmos",
+          rapa: "Rau Ni'u",
+          ru: "Branche du palmier géant",
+          syllables: ["rau", "ni", "pa"],
+          keywords: ["palmier", "branche", "feuille", "herbe"],
+          desc: "Rameau penné du palmier géant éteint Paschalococos disperta, qui couvrait les pentes du Rano Raraku à l’apogée de l’île.",
+          paths: [
+            "M32 69 C31 48 33 28 36 11",
+            "M33 20 L21 15 M34 20 L46 17",
+            "M33 31 L18 26 M33 31 L48 28",
+            "M32 43 L17 38 M32 43 L47 40",
+            "M32 55 L20 50 M32 55 L45 52"
+          ]
+        },
+        "070": {
+          code: "070",
+          cat: "anthropo",
+          rapa: "Tangata Noho",
+          ru: "Lecteur rongorongo assis",
+          syllables: ["no", "kho", "si"],
+          keywords: ["assis", "prêtre", "chanteur", "maître", "lecteur"],
+          desc: "Figure de profil agenouillée ou assise, les bras tendus en avant — la pose du récitatif devant la maison hare paenga.",
+          paths: [
+            "M26 16 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0",
+            "M25 22 C20 34 20 48 26 55 L43 55 L45 68 L51 68",
+            "M28 28 L46 26 L49 20 M28 34 L45 34"
+          ]
+        },
+        "076": {
+          code: "076",
+          cat: "anthropo",
+          rapa: "Ariki Hotu Matua",
+          ru: "Chef suprême Ariki",
+          syllables: ["ar", "ki", "kho"],
+          keywords: ["chef", "roi", "hotu", "matua", "souverain", "ariki"],
+          desc: "Figure majestueuse du souverain au haut couvre-chef et aux paumes déployées, détentrice du mana sacré.",
+          paths: [
+            "M24 16 L32 8 L40 16 L36 23 L28 23 Z",
+            "M28 23 L26 52 L19 69 M36 23 L38 52 L45 69",
+            "M27 30 L12 24 L12 16 M37 30 L52 24 L52 16",
+            "M27 42 L37 42"
+          ]
+        },
+        "090": {
+          code: "090",
+          cat: "anthropo",
+          rapa: "Rima Hapai",
+          ru: "Bras levés de la prière",
+          syllables: ["kha", "pa", "mo"],
+          keywords: ["prière", "louange", "chant", "chanter", "appel"],
+          desc: "Deux bras symétriquement levés, reliés par un arc pectoral. Signe de l’invocation aux divinités et du début de l’hymne solennel.",
+          paths: [
+            "M16 16 L16 42 C16 54 48 54 48 42 L48 16",
+            "M12 20 L16 14 L20 20 M44 20 L48 14 L52 20",
+            "M32 51 L32 69 M25 69 L39 69"
+          ]
+        },
+        "095": {
+          code: "095",
+          cat: "ideo",
+          rapa: "Ua Paoa",
+          ru: "Sceptre à double visage Ua",
+          syllables: ["ua", "zhe", "zl"],
+          keywords: ["sceptre", "bâton", "massue", "garde", "sentinelle"],
+          desc: "Long sceptre cérémoniel en bois dur, à la tête janusienne sculptée au sommet — symbole de la vigilance du chef.",
+          paths: [
+            "M24 12 C20 12 19 22 25 24 L39 24 C45 22 44 12 40 12 Z",
+            "M30 24 L29 69 L35 69 L34 24",
+            "M26 17 L28 17 M36 17 L38 17"
+          ]
+        },
+        "901": {
+          code: "901",
+          cat: "ideo",
+          rapa: "Toko Santiago",
+          ru: "Bâton diviseur de Santiago",
+          syllables: ["to", "ko", "se"],
+          keywords: ["division", "frontière", "pause", "fin"],
+          desc: "Célèbre ligne verticale à renflement central sur le Bâton de Santiago (tablette I), qui sépare les triades cosmogoniques.",
+          paths: [
+            "M32 9 L32 71",
+            "M32 40 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0",
+            "M27 12 L37 12 M27 68 L37 68"
+          ]
+        },
+        "200": {
+          code: "200",
+          cat: "bird",
+          rapa: "Tangata Manu",
+          ru: "Homme-oiseau Tangata Manu",
+          syllables: ["ma", "nu", "pt"],
+          keywords: ["oiseau", "homme-oiseau", "orongo", "tangata"],
+          desc: "Le symbole le plus célèbre de Rapa Nui : corps anthropomorphe de profil, tête et long bec recourbé de frégate du culte d’Orongo.",
+          paths: [
+            "M24 19 C22 13 27 9 34 10 L53 13 C56 14 56 18 52 19 L36 18 C35 22 32 25 27 25",
+            "M24 19 C15 28 14 45 20 56 C24 62 31 62 34 55 C36 45 35 34 32 25",
+            "M34 33 L47 28 L49 36",
+            "M31 58 L42 57 L44 69 L50 69 M22 59 L18 70 L24 70"
+          ]
+        },
+        "205": {
+          code: "205",
+          cat: "bird",
+          rapa: "Manu Rere",
+          ru: "Homme-oiseau planant",
+          syllables: ["le", "re", "ry"],
+          keywords: ["vole", "voler", "vol", "aile", "au-dessus"],
+          desc: "Homme-oiseau aux ailes dentelées largement déployées, en lévitation rituelle au-dessus des rochers de Motu Nui.",
+          paths: [
+            "M28 16 L46 13 C49 13 49 17 45 18 L34 19",
+            "M28 16 C24 26 24 44 32 52 C38 44 38 28 34 19",
+            "M26 27 L9 20 L13 31 L25 34 M37 27 L55 20 L51 31 L37 34",
+            "M28 51 L22 69 M35 51 L41 69"
+          ]
+        },
+        "240": {
+          code: "240",
+          cat: "anthropo",
+          rapa: "Makemake",
+          ru: "Visage du dieu créateur Makemake",
+          syllables: ["mak", "ke", "bo"],
+          keywords: ["makemake", "dieu", "créateur", "esprit", "crâne", "makemake"],
+          desc: "Masque aux grands yeux du dieu démiurge suprême Makemake, créateur de l’humanité et protecteur des oiseaux marins.",
+          paths: [
+            "M14 30 C14 15 26 12 32 19 C38 12 50 15 50 30 C50 45 41 53 32 53 C23 53 14 45 14 30 Z",
+            "M23 29 m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0",
+            "M41 29 m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0",
+            "M32 31 L30 42 L34 42 M24 62 L32 53 L40 62"
+          ]
+        },
+        "280": {
+          code: "280",
+          cat: "fauna",
+          rapa: "Honu",
+          ru: "Tortue marine sacrée",
+          syllables: ["kho", "nu", "che"],
+          keywords: ["tortue", "carapace", "honu"],
+          desc: "Vue de dessus de la tortue marine honu à la carapace ovale et aux nageoires recourbées — habitante sacrée du grand océan.",
+          paths: [
+            "M32 22 C44 22 47 54 32 58 C17 54 20 22 32 22 Z",
+            "M32 22 L32 11 M29 14 L35 14",
+            "M22 28 L10 21 L12 32 M42 28 L54 21 L52 32",
+            "M23 51 L13 63 M41 51 L51 63 M32 58 L32 69"
+          ]
+        },
+        "380": {
+          code: "380",
+          cat: "anthropo",
+          rapa: "Tangata Hoko",
+          ru: "Maître scribe au bâton",
+          syllables: ["kho", "ko", "pi"],
+          keywords: ["scribe", "érudit", "gardien", "savoir"],
+          desc: "Figure formelle récurrente du prêtre assis tenant un bâton vertical ; elle ouvre la célèbre chaîne parallèle des tablettes P, Q et H.",
+          paths: [
+            "M23 17 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0",
+            "M22 22 C17 34 18 49 25 56 L39 56 L40 68",
+            "M26 30 L46 30 M46 11 L46 69"
+          ]
+        },
+        "400": {
+          code: "400",
+          cat: "bird",
+          rapa: "Manu Tara",
+          ru: "Sterne noire Manu Tara",
+          syllables: ["ta", "ra", "kr"],
+          keywords: ["sterne", "œuf", "printemps", "nid"],
+          desc: "Sterne marine sacrée dont le premier œuf de printemps sur l’îlot Motu Nui désignait l’élu de Makemake pour une année entière.",
+          paths: [
+            "M20 20 C20 14 27 12 32 16 L46 16 L36 22",
+            "M23 21 C18 33 20 49 30 54 C38 50 40 35 35 22",
+            "M28 54 L23 68 M33 54 L39 68 M20 35 L11 43"
+          ]
+        },
+        "430": {
+          code: "430",
+          cat: "bird",
+          rapa: "Moa",
+          ru: "Oiseau moa polynésien",
+          syllables: ["mo", "a", "ku"],
+          keywords: ["moa", "coq", "oiseau", "richesse"],
+          desc: "Oiseau à la queue fournie incurvée en faucille et à la crête — mesure majeure de l’aisance et des dons rituels dans l’ancienne société de Rapa Nui.",
+          paths: [
+            "M24 19 L34 15 L30 22",
+            "M24 19 C19 29 20 45 29 51 C37 49 39 38 35 28",
+            "M36 33 C47 26 54 36 49 49 C46 42 42 39 36 41",
+            "M26 51 L22 68 M32 51 L36 68"
+          ]
+        },
+        "520": {
+          code: "520",
+          cat: "ideo",
+          rapa: "Hau Kura",
+          ru: "Couronne de plumes du chef",
+          syllables: ["khau", "ku", "ve"],
+          keywords: ["couronne", "diadème", "plumes", "gloire"],
+          desc: "Large diadème semi-circulaire en plumes caudales choisies d’oiseaux tropicaux et de coqs moa.",
+          paths: [
+            "M14 52 C18 34 46 34 50 52 Z",
+            "M18 43 L12 22 M25 39 L22 16 M32 37 L32 13 M39 39 L42 16 M46 43 L52 22",
+            "M20 58 L44 58"
+          ]
+        },
+        "600": {
+          code: "600",
+          cat: "bird",
+          rapa: "Manu Kena / Makohe",
+          ru: "Grand frégate au bec crochu",
+          syllables: ["fre", "ga", "ke"],
+          keywords: ["frégate", "milan", "bec", "porte"],
+          desc: "Signe calligraphique classique du rongorongo : la frégate au long cou et au bout du bec crochu.",
+          paths: [
+            "M26 24 C24 14 29 10 38 11 L54 14 C56 17 53 21 49 19 L51 15",
+            "M26 24 C18 34 19 49 27 56 C35 56 39 45 36 31 L38 18",
+            "M36 34 L50 29 L45 41",
+            "M26 56 L22 69 L28 69 M33 55 L38 69 L44 69"
+          ]
+        },
+        "670": {
+          code: "670",
+          cat: "bird",
+          rapa: "Manu Rua",
+          ru: "Frégate sacrée bicéphale",
+          syllables: ["ru", "a", "dv"],
+          keywords: ["double", "alliance", "jumeaux", "paix"],
+          desc: "Oiseau héraldique à deux têtes — symbole de l’alliance des deux phratries de l’île (Tuu et Hotu-Iti) et de la puissance sacrée dédoublée.",
+          paths: [
+            "M28 24 L11 15 C9 17 11 20 14 19 M36 24 L53 15 C55 17 53 20 50 19",
+            "M28 24 C20 34 21 51 32 56 C43 51 44 34 36 24 Z",
+            "M27 55 L22 69 M37 55 L42 69"
+          ]
+        },
+        "700": {
+          code: "700",
+          cat: "fauna",
+          rapa: "Ika",
+          ru: "Poisson sacré Ika",
+          syllables: ["ik", "ry", "ba"],
+          keywords: ["poisson", "thon", "sacrifice", "prise", "ika"],
+          desc: "Poisson océanique fusiforme, la tête en haut, avec nageoires et queue fourchue. Dans la langue métaphorique, il désigne aussi le captif.",
+          paths: [
+            "M32 10 C45 24 45 48 32 59 C19 48 19 24 32 10 Z",
+            "M32 59 L22 70 L32 66 L42 70 Z",
+            "M22 32 L13 38 M42 32 L51 38",
+            "M27 22 C30 25 34 25 37 22"
+          ]
+        },
+        "730": {
+          code: "730",
+          cat: "fauna",
+          rapa: "Moko",
+          ru: "Lézard Moko",
+          syllables: ["mo", "ko", "yashch"],
+          keywords: ["lézard", "moko", "gardien", "maison"],
+          desc: "Scinque polynésien à l’échine allongée, aux quatre pattes et à la queue spiralée — esprit gardien du seuil de l’habitation.",
+          paths: [
+            "M32 10 L38 17 L32 23 L26 17 Z",
+            "M32 23 L32 54 C32 64 42 68 44 61 C45 57 40 56 39 60",
+            "M32 28 L17 21 L14 27 M32 28 L47 21 L50 27",
+            "M32 45 L17 51 L15 58 M32 45 L47 51 L49 58"
+          ]
+        },
+        "760": {
+          code: "760",
+          cat: "fauna",
+          rapa: "He'e / Feke",
+          ru: "Pieuvre de la lagune He'e",
+          syllables: ["fe", "ke", "os"],
+          keywords: ["pieuvre", "vague", "abîme", "tentacules"],
+          desc: "Manteau en dôme de la pieuvre aux tentacules ondoyants divergents — divinité marine des profondeurs de la Polynésie.",
+          paths: [
+            "M22 25 C22 12 42 12 42 25 C42 33 37 37 32 37 C27 37 22 33 22 25 Z",
+            "M26 36 C16 44 12 56 17 66 M30 37 C24 49 23 60 27 69",
+            "M34 37 C40 49 41 60 37 69 M38 36 C48 44 52 56 47 66"
+          ]
+        }
+      };
+
+      const GLYPH_ORDER = [
+        "001", "002", "004", "006", "070", "076", "090", "380", "240", "025",
+        "200", "205", "400", "430", "600", "670",
+        "700", "280", "730", "760",
+        "008", "009", "040", "041", "053", "028", "050", "060",
+        "010", "014", "022", "034", "044", "095", "520", "901"
+      ];
+
+      /* =====================================================================
+         2. КОНСТРУКТОР СОСТАВНЫХ ЛИГАТУР (динамический синтез путей)
+         ===================================================================== */
+      function buildLigatureDefinition(baseId, headId, handId) {
+        const codeParts = [baseId];
+        if (headId !== "none") codeParts.push(headId);
+        const fullCode = "L-" + codeParts.join(".") + (handId !== "none" ? "+" + handId : "");
+
+        const paths = [];
+        // 1. Тело без верхнего сегмента, если выбрана сменная голова
+        if (baseId === "001") {
+          paths.push("M28 26 L27 52 L20 70 L14 70 M36 26 L37 52 L44 70 L50 70");
+          paths.push(handId !== "none" ? "M27 30 L15 39 M37 30 L48 25" : "M27 30 L15 39 M37 30 L49 39");
+          if (headId === "none") paths.push("M32 10 L40 18 L32 25 L24 18 Z");
+        } else if (baseId === "200") {
+          paths.push("M24 25 C16 33 16 47 21 57 C25 62 31 62 34 55 C36 46 35 35 32 26");
+          paths.push("M31 58 L41 57 L43 69 M22 59 L18 70");
+          paths.push(handId !== "none" ? "M34 34 L47 27" : "M34 34 L46 29 L48 36");
+          if (headId === "none") paths.push("M24 23 C22 14 28 10 35 11 L52 14 C54 15 54 18 50 19 L34 19");
+        } else if (baseId === "070") {
+          paths.push("M24 25 C19 36 19 49 25 56 L41 56 L43 69");
+          paths.push("M27 31 L46 28");
+          if (headId === "none") paths.push("M25 17 m-6 0 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0");
+        } else if (baseId === "600") {
+          paths.push("M25 26 C18 35 19 49 27 56 C35 56 38 45 36 31");
+          paths.push("M26 56 L22 69 M33 55 L38 69");
+          paths.push("M36 34 L47 28");
+          if (headId === "none") paths.push("M26 25 C24 14 29 10 38 11 L53 14 C55 17 52 20 48 18");
+        } else if (baseId === "050") {
+          paths.push("M32 24 L32 69 M32 37 L18 29 M32 50 L18 42 M32 50 L45 43 M24 69 L40 69");
+          paths.push("M32 36 L46 28");
+          if (headId === "none") paths.push("M32 11 L32 24 M32 22 L20 14 M32 22 L44 14");
+        }
+
+        // 2. Модификатор головы
+        if (headId === "008") {
+          paths.push("M30 16 m-5 0 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0");
+          paths.push("M30 6 L30 10 M19 11 L23 13 M41 11 L37 13 M20 21 L24 19 M40 21 L36 19");
+        } else if (headId === "040") {
+          paths.push("M39 7 C21 10 21 25 39 26 C29 22 29 11 39 7 Z");
+        } else if (headId === "240") {
+          paths.push("M20 16 C20 9 27 8 30 12 C33 8 40 9 40 16 C40 22 35 25 30 25 C25 25 20 22 20 16 Z");
+          paths.push("M26 16 L27 16 M33 16 L34 16");
+        } else if (headId === "520") {
+          paths.push("M20 23 C23 15 37 15 40 23 Z M22 18 L18 9 M30 15 L30 6 M38 18 L42 9");
+        }
+
+        // 3. Атрибут в правой руке / у крыла
+        if (handId === "700") {
+          paths.push("M52 14 C58 21 58 34 52 40 C46 34 46 21 52 14 Z M52 40 L48 46 L56 46 Z");
+        } else if (handId === "010") {
+          paths.push("M52 11 C57 14 57 22 52 25 C47 22 47 14 52 11 Z M52 25 L52 33 M52 33 C57 36 57 44 52 47 C47 44 47 36 52 33 Z");
+        } else if (handId === "034") {
+          paths.push("M48 14 L48 35 C48 43 57 45 59 38 C60 33 58 27 54 25");
+        } else if (handId === "095") {
+          paths.push("M49 12 L55 12 L54 18 L50 18 Z M52 18 L52 49");
+        } else if (handId === "901") {
+          paths.push("M53 11 L53 49 M53 29 m-3 0 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0");
+        }
+
+        const baseTitle = GLYPHS[baseId] ? GLYPHS[baseId].ru : baseId;
+        const headTitle = headId !== "none" && GLYPHS[headId] ? " + cime «" + GLYPHS[headId].rapa + "»" : "";
+        const handTitle = handId !== "none" && GLYPHS[handId] ? " + attribut «" + GLYPHS[handId].rapa + "»" : "";
+
+        return {
+          code: fullCode,
+          cat: "ligature",
+          rapa: "Ligature " + fullCode,
+          ru: baseTitle + headTitle + handTitle,
+          desc: "Ligature polynésienne composite associant la base B-" + baseId +
+            (headId !== "none" ? ", le remplacement de tête B-" + headId : "") +
+            (handId !== "none" ? " et le signe B-" + handId + " fixé à la main" : "") + ".",
+          paths: paths
+        };
+      }
+
+      /* =====================================================================
+         3. ИСТОРИЧЕСКИЕ ПАМЯТНИКИ ДЛЯ ДОЩЕЧКИ КОХАУ
+         ===================================================================== */
+      const TABLET_PRESETS = {
+        mamari: {
+          title: "Tablette C « Mamari » (Rome) — Calendrier des nuits de la Lune",
+          rowPrefix: "Ca",
+          rows: [
+            ["380", "040", "700", "034", "040", "008", "040", "200", "041", "700", "034", "040"],
+            ["040", "053", "040", "280", "034", "700", "041", "240", "040", "008", "600", "040"],
+            ["200", "010", "040", "700", "090", "009", "041", "034", "760", "040", "050", "901"]
+          ]
+        },
+        kunstkamera: {
+          title: "Grande tablette P de Pétersbourg (Kunstkamera, MAE RAN)",
+          rowPrefix: "Pr",
+          rows: [
+            ["380", "001", "600", "008", "200", "700", "076", "095", "050", "022", "240", "006"],
+            ["070", "010", "600", "040", "280", "034", "700", "090", "009", "053", "060", "028"],
+            ["380", "200", "044", "520", "076", "010", "670", "700", "004", "025", "730", "901"]
+          ]
+        },
+        santiago: {
+          title: "Bâton de Santiago (tablette I, Chili) — Triades cosmogoniques",
+          rowPrefix: "Is",
+          rows: [
+            ["240", "022", "009", "028", "901", "008", "022", "053", "050", "901", "600", "700"],
+            ["076", "022", "280", "200", "901", "600", "022", "700", "400", "901", "090", "041"],
+            ["004", "022", "060", "044", "901", "380", "095", "205", "010", "901", "240", "008"]
+          ]
+        },
+        tahua: {
+          title: "Tablette A « Tahua » (gravée sur une pale de rame européenne)",
+          rowPrefix: "Ab",
+          rows: [
+            ["076", "010", "002", "280", "028", "060", "050", "200", "520", "090", "008", "009"],
+            ["600", "205", "400", "700", "034", "014", "053", "028", "001", "006", "095", "430"],
+            ["240", "025", "040", "041", "380", "004", "022", "076", "670", "760", "010", "901"]
+          ]
+        }
+      };
+
+      /* =====================================================================
+         4. НАУЧНЫЕ ДАННЫЕ: КУНСТКАМЕРА, КАЛЕНДАРЬ МАМАРИ, ТРИАДЫ САНТЬЯГО
+         ===================================================================== */
+      const KUNSTKAMERA_PARALLELS = {
+        columns: [
+          {
+            p: "380", q: "380", h: "380",
+            note: "Position 1 (B-380) : le Prologue « Lecteur assis au bâton » est strictement identique sur les deux tablettes de la Kunstkamera (P et Q) et sur la grande tablette de Santiago (H). B. G. Koudriavtsev a utilisé ce repère comme clé pour le collationnement des listes."
+          },
+          {
+            p: "001", q: "002", h: "001",
+            note: "Position 2 (B-001 / B-002) : variation allographique de la posture de la figure. Sur la petite tablette Q de Pétersbourg, le scribe a dessiné la figure avec la main levée, sans changer la lecture du radical."
+          },
+          {
+            p: "600", q: "600", h: "200",
+            note: "Position 3 (B-600 / B-200) : alternance de la frégate sacrée et de l’homme-oiseau Tangata Manu — témoignage d’une étroite synonymie des titres ornithomorphes."
+          },
+          {
+            p: "008", q: "008", h: "008",
+            note: "Position 4 (B-008) : rosette solaire Ra'a / étoile Hetu'u inchangée dans les trois manuscrits."
+          },
+          {
+            p: "076", q: "520", h: "076",
+            note: "Position 5 (B-076 → B-520) : réduction métonymique ! Sur la tablette Q, au lieu de la figure complète du chef suprême Ariki, seule sa couronne de plumes Hau Kura a été gravée."
+          },
+          {
+            p: "095", q: "095", h: "010",
+            note: "Position 6 (B-095 / B-010) : changement de l’insigne du pouvoir — le sceptre à double visage Ua dans les listes de Pétersbourg et le rame cérémoniel Ao dans la liste chilienne."
+          },
+          {
+            p: "700", q: "700", h: "700",
+            note: "Position 7 (B-700) : idéogramme stable du poisson sacrificiel Ika, qui clôt la formule rituelle de l’offrande."
+          },
+          {
+            p: "050", q: "060", h: "050",
+            note: "Position 8 (B-050 / B-060) : paire botanique « Arbre Tumu / Branche de palmier », qui conclut la strophe du canon parallèle."
+          }
+        ]
+      };
+
+      const MAMARI_PHASES = [
+        { glyph: "380", night: "Prologue", name: "Indicateur", info: "Signe introductif de la section calendaire sur la ligne Ca6 de la tablette C « Mamari » : le prêtre observateur des levers des astres." },
+        { glyph: "040", night: "Nuit 1", name: "Ohiro", info: "Nouvelle lune (Ohiro) — le plus fin jeune croissant de Lune après le coucher du soleil. Début du comptage du mois lunaire de Rapa Nui." },
+        { glyph: "034", night: "Nuits 3–6", name: "Mangai", info: "Signe de l’hameçon de pêche en os : s’ouvre la période favorable à la pêche marine nocturne près des récifs." },
+        { glyph: "200", night: "Nuit 8", name: "Tamatea", info: "Premier quartier de la Lune montante, marqué par la figure de Tangata Manu et le renforcement des courants océaniques." },
+        { glyph: "008", night: "Nuits 11–13", name: "Huna / Ari", info: "Veillée de la pleine lune — nuits brillantes où la clarté lunaire rivalise avec les étoiles." },
+        { glyph: "041", night: "Nuit 15", name: "Omotohi", info: "Apogée du calendrier « Mamari » — la pleine Lune ronde d’Omotohi ! Jacques Guy et Thomas Barthel ont démontré que le nombre de croissants avant et après ce disque correspond à l’astronomie réelle de l’hémisphère Sud." },
+        { glyph: "700", night: "Nuit 16", name: "Ina-ira", info: "Nuit de la grande pêche au thon (signe du poisson Ika B-700 juste après la pleine lune) et de l’offrande des premiers fruits." },
+        { glyph: "240", night: "Nuits 20–24", name: "Tangaroa", info: "Nuits décroissantes de la Lune, consacrées aux seigneurs de l’océan et aux esprits des ancêtres." },
+        { glyph: "040", night: "Nuit 28", name: "Motu", info: "Vieux croissant fondant précédant les deux nuits sombres sans lune d’Omutu, qui closent le cycle de 30 jours.", }
+      ];
+
+      const SANTIAGO_TRIADS = [
+        {
+          signs: ["240", "022", "009", "028", "901"],
+          formula: "Makemake (240) + Union (022) + Ciel (009) → la Terre (028) est née | [901]",
+          desc: "Première modèle cosmogonique selon N. Boutinov, Yu. Knorozov et S. Fischer : l’union sacrée du principe originel engendre la terre habitable de l’île."
+        },
+        {
+          signs: ["008", "022", "053", "050", "901"],
+          formula: "Soleil (008) + Union (022) + Pluie (053) → l’arbre toromiro (050) est né | [901]",
+          desc: "Triade botanique qui fait écho à la psalmodie orale de Rapa Nui « He timo te ako-ako », consignée par l’expédition de Katherine Routledge."
+        },
+        {
+          signs: ["600", "022", "700", "200", "901"],
+          formula: "Frégate (600) + Union (022) + Poisson de l’océan (700) → Tangata Manu (200) est né | [901]",
+          desc: "Triade mythologique de l’union des éléments de l’air et de l’océan dans le culte de l’homme-oiseau des rochers d’Orongo."
+        }
+      ];
+
+      /* =====================================================================
+         5. АУДИО-ДВИЖОК РЕЗЦА ПО ДЕРЕВУ (чистый Web Audio API без файлов)
+         ===================================================================== */
+      let audioCtx = null;
+      let soundEnabled = true;
+
+      function ensureAudio() {
+        if (!soundEnabled) return null;
+        if (!audioCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (Ctx) audioCtx = new Ctx();
+        }
+        if (audioCtx && audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
+      function playWoodSound(kind) {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        if (kind === "carve") {
+          // Короткий хруст резца обсидиана по твёрдой древесине торомиро
+          const bufferSize = Math.floor(ctx.sampleRate * 0.055);
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.28));
+          }
+          const noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(920 + Math.random() * 340, now);
+          filter.Q.setValueAtTime(3.4, now);
+
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.002, now + 0.052);
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+          noise.start(now);
+        } else if (kind === "flip") {
+          // Глухой деревянный резонанс при повороте тяжёлой дощечки на 180°
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(148, now);
+          osc.frequency.exponentialRampToValueAtTime(64, now + 0.22);
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (kind === "chant") {
+          // Мягкий деревянный удар паху для шага чтеца тангата-ронгоронго
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(256 + Math.random() * 45, now);
+          osc.frequency.exponentialRampToValueAtTime(130, now + 0.11);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.13);
+        }
+      }
+
+      /* =====================================================================
+         6. СОСТОЯНИЕ ПРИЛОЖЕНИЯ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ РЕНДЕРА
+         ===================================================================== */
+      const CUSTOM_GLYPHS = {}; // Пользовательские и составные знаки (L-..., U-...)
+
+      const WOOD_THEMES = {
+        toromiro: {
+          base: "#5b2e17",
+          mid: "#6e391d",
+          dark: "#381a0b",
+          stroke: "#f3dcc0"
+        },
+        miro: {
+          base: "#481c18",
+          mid: "#5d2520",
+          dark: "#2b0e0c",
+          stroke: "#f6dfd0"
+        },
+        ash: {
+          base: "#6e5233",
+          mid: "#826340",
+          dark: "#46331e",
+          stroke: "#fff2dc"
+        },
+        driftwood: {
+          base: "#4a433b",
+          mid: "#5c544a",
+          dark: "#2d2823",
+          stroke: "#efe9df"
+        }
+      };
+
+      const state = {
+        presetKey: "mamari",
+        rowPrefix: "Ca",
+        rows: [],
+        activeRow: 0,
+        selectedPos: { row: 0, col: 0 },
+        boustrophedon: true,
+        tabletRotated180: false,
+        chanterPlaying: false,
+        chanterTimer: null,
+        chanterCursor: { row: 0, col: -1 },
+        catalogCategory: "all",
+        catalogQuery: "",
+        customCounter: 1
+      };
+
+      function getGlyphDef(code) {
+        return GLYPHS[code] || CUSTOM_GLYPHS[code] || GLYPHS["200"];
+      }
+
+      function createGlyphSvgMarkup(code, extraClass) {
+        const def = getGlyphDef(code);
+        const cls = extraClass ? ' class="' + extraClass + '"' : "";
+        const pathTags = def.paths
+          .map(function (d) {
+            return '<path d="' + d + '" />';
+          })
+          .join("");
+        return '<svg viewBox="0 0 64 80"' + cls + ' aria-hidden="true">' + pathTags + "</svg>";
+      }
+
+      /* =====================================================================
+         7. УПРАВЛЕНИЕ ДОЩЕЧКОЙ КОХАУ, БУСТРОФЕДОНОМ И РЕЖИМОМ ЖРЕЦА
+         ===================================================================== */
+      const kohauWoodEl = document.getElementById("kohauWood");
+      const kohauRowsEl = document.getElementById("kohauRows");
+      const orientationBadgeEl = document.getElementById("orientationBadge");
+      const inspectorSvgEl = document.getElementById("inspectorGlyphSvg");
+      const inspectorCodeEl = document.getElementById("inspectorCode");
+      const inspectorMetaEl = document.getElementById("inspectorMeta");
+      const inspectorTitleEl = document.getElementById("inspectorTitle");
+      const inspectorDescEl = document.getElementById("inspectorDesc");
+
+      function loadPreset(key) {
+        stopChanter();
+        const preset = TABLET_PRESETS[key] || TABLET_PRESETS.mamari;
+        state.presetKey = key;
+        state.rowPrefix = preset.rowPrefix;
+        state.rows = preset.rows.map(function (r) {
+          return r.slice();
+        });
+        state.activeRow = 0;
+        state.selectedPos = { row: 0, col: 0 };
+        state.chanterCursor = { row: 0, col: -1 };
+        if (state.tabletRotated180) {
+          state.tabletRotated180 = false;
+          updateTabletRotationUI();
+        }
+        renderTablet();
+        inspectGlyphAt(0, 0);
+      }
+
+      function updateTabletRotationUI() {
+        kohauWoodEl.classList.toggle("rotated-180", state.tabletRotated180);
+        if (state.tabletRotated180) {
+          orientationBadgeEl.textContent = "Orientation : 180° (les lignes paires sont maintenant droites !)";
+        } else {
+          orientationBadgeEl.textContent = "Orientation : 0° (les lignes impaires sont droites)";
+        }
+      }
+
+      function toggleTabletRotation(forceState) {
+        const next = typeof forceState === "boolean" ? forceState : !state.tabletRotated180;
+        if (next !== state.tabletRotated180) {
+          state.tabletRotated180 = next;
+          playWoodSound("flip");
+          updateTabletRotationUI();
+        }
+      }
+
+      function renderTablet() {
+        kohauRowsEl.innerHTML = "";
+
+        if (state.rows.length === 0) {
+          state.rows.push([]);
+        }
+        if (state.activeRow >= state.rows.length) {
+          state.activeRow = state.rows.length - 1;
+        }
+
+        state.rows.forEach(function (rowGlyphs, rIdx) {
+          const rowEl = document.createElement("div");
+          rowEl.className = "kohau-row";
+          const isInvertedRow = state.boustrophedon && rIdx % 2 === 1;
+          if (isInvertedRow) rowEl.classList.add("boustro-inverted");
+          if (rIdx === state.activeRow) rowEl.classList.add("active-reading-row");
+
+          rowEl.addEventListener("click", function (e) {
+            if (e.target === rowEl || e.target.classList.contains("row-glyphs")) {
+              state.activeRow = rIdx;
+              renderTablet();
+            }
+          });
+
+          const metaEl = document.createElement("div");
+          metaEl.className = "row-meta";
+          const arrow = isInvertedRow ? "↺180°" : "→0°";
+          metaEl.innerHTML =
+            "<span>" + state.rowPrefix + (rIdx + 1) + "</span>" +
+            "<span>" + arrow + "</span>";
+          rowEl.appendChild(metaEl);
+
+          const stripEl = document.createElement("div");
+          stripEl.className = "row-glyphs";
+
+          if (rowGlyphs.length === 0) {
+            const emptyHint = document.createElement("span");
+            emptyHint.style.fontSize = "12px";
+            emptyHint.style.color = "rgba(244, 224, 198, 0.45)";
+            emptyHint.textContent = "Canalure vide — choisissez un signe du catalogue ci-dessous pour le graver";
+            stripEl.appendChild(emptyHint);
+          } else {
+            rowGlyphs.forEach(function (code, cIdx) {
+              const cell = document.createElement("div");
+              cell.className = "carved-glyph";
+              if (
+                state.selectedPos &&
+                state.selectedPos.row === rIdx &&
+                state.selectedPos.col === cIdx
+              ) {
+                cell.classList.add("selected");
+              }
+              if (
+                state.chanterCursor.row === rIdx &&
+                state.chanterCursor.col === cIdx
+              ) {
+                cell.classList.add("chanter-focus");
+              }
+              cell.title = "B-" + code + " · " + getGlyphDef(code).ru;
+              cell.innerHTML = createGlyphSvgMarkup(code);
+
+              cell.addEventListener("click", function (ev) {
+                ev.stopPropagation();
+                state.activeRow = rIdx;
+                state.selectedPos = { row: rIdx, col: cIdx };
+                playWoodSound("chant");
+                inspectGlyphAt(rIdx, cIdx);
+                renderTablet();
+              });
+
+              stripEl.appendChild(cell);
+            });
+          }
+
+          rowEl.appendChild(stripEl);
+          kohauRowsEl.appendChild(rowEl);
+        });
+
+        updateLiveStatistics();
+      }
+
+      function inspectGlyphAt(rIdx, cIdx) {
+        const row = state.rows[rIdx] || [];
+        const code = row[cIdx];
+        if (!code) return;
+        const def = getGlyphDef(code);
+        const isInv = state.boustrophedon && rIdx % 2 === 1;
+        inspectorSvgEl.innerHTML = createGlyphSvgMarkup(code, "glyph-preview-svg");
+        inspectorCodeEl.textContent = code.indexOf("-") > -1 ? code : "B-" + code;
+        inspectorMetaEl.textContent =
+          "Ligne " +
+          state.rowPrefix +
+          (rIdx + 1) +
+          " · Position " +
+          (cIdx + 1) +
+          (isInv ? " · inversée à 180° (boustrophédon inverse)" : " · ligne droite");
+        inspectorTitleEl.textContent = def.rapa + " — " + def.ru;
+        inspectorDescEl.textContent = def.desc;
+      }
+
+      function inspectGlyphByCode(code, customLabel) {
+        const def = getGlyphDef(code);
+        inspectorSvgEl.innerHTML = createGlyphSvgMarkup(code, "glyph-preview-svg");
+        inspectorCodeEl.textContent = code.indexOf("-") > -1 ? code : "B-" + code;
+        inspectorMetaEl.textContent = customLabel || "Référence du catalogue de T. Barthel";
+        inspectorTitleEl.textContent = def.rapa + " — " + def.ru;
+        inspectorDescEl.textContent = def.desc;
+      }
+
+      function carveGlyphToTablet(code) {
+        if (!state.rows[state.activeRow]) {
+          state.rows[state.activeRow] = [];
+        }
+        // Если активная канелюра заполнена (14 знаков), создаём следующую
+        if (state.rows[state.activeRow].length >= 14) {
+          state.rows.push([]);
+          state.activeRow = state.rows.length - 1;
+        }
+        state.rows[state.activeRow].push(code);
+        const newCol = state.rows[state.activeRow].length - 1;
+        state.selectedPos = { row: state.activeRow, col: newCol };
+        playWoodSound("carve");
+        renderTablet();
+        inspectGlyphAt(state.activeRow, newCol);
+      }
+
+      /* Режим чтения жреца тангата-ронгоронго */
+      function stepChanter() {
+        const totalGlyphs = state.rows.reduce(function (acc, r) {
+          return acc + r.length;
+        }, 0);
+        if (totalGlyphs === 0) {
+          stopChanter();
+          return;
+        }
+
+        let r = state.chanterCursor.row;
+        let c = state.chanterCursor.col + 1;
+
+        while (r < state.rows.length && c >= state.rows[r].length) {
+          r++;
+          c = 0;
+        }
+
+        if (r >= state.rows.length) {
+          r = 0;
+          c = 0;
+          while (r < state.rows.length && state.rows[r].length === 0) {
+            r++;
+          }
+        }
+
+        state.chanterCursor = { row: r, col: c };
+        state.activeRow = r;
+        state.selectedPos = { row: r, col: c };
+
+        // Автоматический физический переворот дощечки на 180° на чётных по счёту канелюрах!
+        if (state.boustrophedon) {
+          const shouldRotate = r % 2 === 1;
+          if (shouldRotate !== state.tabletRotated180) {
+            toggleTabletRotation(shouldRotate);
+          } else {
+            playWoodSound("chant");
+          }
+        } else {
+          playWoodSound("chant");
+        }
+
+        inspectGlyphAt(r, c);
+        renderTablet();
+      }
+
+      function stopChanter() {
+        state.chanterPlaying = false;
+        if (state.chanterTimer) {
+          clearInterval(state.chanterTimer);
+          state.chanterTimer = null;
+        }
+        const btn = document.getElementById("chanterPlayBtn");
+        btn.textContent = "▶ Lecture du prêtre";
+        btn.classList.remove("active");
+      }
+
+      function toggleChanterPlay() {
+        if (state.chanterPlaying) {
+          stopChanter();
+        } else {
+          state.chanterPlaying = true;
+          const btn = document.getElementById("chanterPlayBtn");
+          btn.textContent = "⏸ Pause de la lecture";
+          btn.classList.add("active");
+          stepChanter();
+          state.chanterTimer = setInterval(stepChanter, 920);
+        }
+      }
+
+      /* =====================================================================
+         8. ФОНЕТИКО-ИДЕОГРАФИЧЕСКИЙ ТРАНСКРИПТОР ФРАЗ
+         ===================================================================== */
+      const PHONETIC_POOL = [
+        "001", "002", "006", "010", "014", "025", "034", "040",
+        "044", "050", "060", "070", "090", "200", "400", "600", "700", "730"
+      ];
+
+      function transcribePhraseToTablet(rawText) {
+        const cleaned = (rawText || "").trim();
+        if (!cleaned) return;
+        stopChanter();
+
+        const words = cleaned
+          .toLowerCase()
+          .replace(/[^a-zà-ÿ0-9'\-\s]/gi, " ")
+          .split(/\s+/)
+          .filter(Boolean);
+
+        const carvedList = [];
+        let ideogramMatches = 0;
+        let syllabicMatches = 0;
+
+        words.forEach(function (word) {
+          if (word === "et" || word === "à") {
+            carvedList.push("022"); // связка соединения
+            ideogramMatches++;
+            return;
+          }
+
+          // 1. Поиск прямой семантической идеограммы по корню слова
+          let matchedCode = null;
+          for (let i = 0; i < GLYPH_ORDER.length; i++) {
+            const gCode = GLYPH_ORDER[i];
+            const g = GLYPHS[gCode];
+            const hit = g.keywords.some(function (kw) {
+              return word === kw || (word.length >= 4 && kw.length >= 4 && word.slice(0, 4) === kw.slice(0, 4));
+            });
+            if (hit) {
+              matchedCode = gCode;
+              break;
+            }
+          }
+
+          if (matchedCode) {
+            carvedList.push(matchedCode);
+            ideogramMatches++;
+          } else {
+            // 2. Слоговое разложение (открытые полинезийские слоги по 2–3 буквы)
+            const chunks = word.match(/.{1,3}/g) || [word];
+            chunks.slice(0, 3).forEach(function (chunk) {
+              let hash = 0;
+              for (let k = 0; k < chunk.length; k++) {
+                hash = (hash * 31 + chunk.charCodeAt(k)) >>> 0;
+              }
+              const chosen = PHONETIC_POOL[hash % PHONETIC_POOL.length];
+              carvedList.push(chosen);
+              syllabicMatches++;
+            });
+          }
+        });
+
+        carvedList.push("901"); // финальный разделительный посох
+
+        // Разбиваем на канелюры по 11 знаков
+        const newRows = [];
+        for (let i = 0; i < carvedList.length; i += 11) {
+          newRows.push(carvedList.slice(i, i + 11));
+        }
+
+        state.rowPrefix = "Kr";
+        state.rows = newRows;
+        state.activeRow = 0;
+        state.selectedPos = { row: 0, col: 0 };
+        state.chanterCursor = { row: 0, col: -1 };
+        toggleTabletRotation(false);
+        playWoodSound("carve");
+        renderTablet();
+        inspectGlyphAt(0, 0);
+
+        document.getElementById("transcribeLog").textContent =
+          "Glyphes gravés : " +
+          carvedList.length +
+          " (idéogrammes racines : " +
+          ideogramMatches +
+          ", signes syllabiques : " +
+          syllabicMatches +
+          ")";
+      }
+
+      /* =====================================================================
+         9. ЭКСПОРТ РЕЗНОЙ ТАБЛИЧКИ КОХАУ В PNG (чистый Canvas 2D + Path2D)
+         ===================================================================== */
+      function exportTabletToPng() {
+        const padX = 48;
+        const padY = 44;
+        const rowH = 92;
+        const maxCols = Math.max(
+          10,
+          state.rows.reduce(function (m, r) {
+            return Math.max(m, r.length);
+          }, 0)
+        );
+        const width = Math.max(880, padX * 2 + 64 + maxCols * 56);
+        const height = padY * 2 + state.rows.length * rowH + 46;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+
+        const woodKey = document.getElementById("woodSelect").value || "toromiro";
+        const theme = WOOD_THEMES[woodKey] || WOOD_THEMES.toromiro;
+
+        // Тёмный музейный фон
+        ctx.fillStyle = "#0e0b09";
+        ctx.fillRect(0, 0, width, height);
+
+        // Тело деревянной дощечки
+        const grad = ctx.createLinearGradient(0, 0, width, height);
+        grad.addColorStop(0, theme.dark);
+        grad.addColorStop(0.22, theme.base);
+        grad.addColorStop(0.52, theme.mid);
+        grad.addColorStop(0.82, theme.base);
+        grad.addColorStop(1, theme.dark);
+
+        function traceRoundedRect(c, x, y, w, h, r) {
+          const rad = Math.min(r, w / 2, h / 2);
+          c.beginPath();
+          c.moveTo(x + rad, y);
+          c.arcTo(x + w, y, x + w, y + h, rad);
+          c.arcTo(x + w, y + h, x, y + h, rad);
+          c.arcTo(x, y + h, x, y, rad);
+          c.arcTo(x, y, x + w, y, rad);
+          c.closePath();
+        }
+
+        ctx.save();
+        traceRoundedRect(ctx, 20, 18, width - 40, height - 54, 34);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(255, 214, 170, 0.28)";
+        ctx.stroke();
+        ctx.clip();
+
+        // Волокна древесины
+        for (let y = 20; y < height - 36; y += 5) {
+          ctx.strokeStyle = y % 10 === 0 ? "rgba(18, 7, 2, 0.24)" : "rgba(255, 220, 180, 0.04)";
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(20, y);
+          ctx.bezierCurveTo(width * 0.33, y + 3, width * 0.66, y - 3, width - 20, y + 1);
+          ctx.stroke();
+        }
+
+        // Канелюры и глифы
+        state.rows.forEach(function (rowGlyphs, rIdx) {
+          const ry = padY + rIdx * rowH;
+          ctx.fillStyle = "rgba(15, 6, 2, 0.42)";
+          traceRoundedRect(ctx, padX, ry, width - padX * 2, rowH - 10, 14);
+          ctx.fill();
+
+          const isInv = state.boustrophedon && rIdx % 2 === 1;
+          ctx.fillStyle = "rgba(244, 224, 198, 0.62)";
+          ctx.font = "12px monospace";
+          ctx.fillText(state.rowPrefix + (rIdx + 1) + (isInv ? " ↺" : " →"), padX + 10, ry + 45);
+
+          ctx.save();
+          if (isInv) {
+            // Обратный бустрофедон: вся строка глифов повернута на 180°
+            const stripLeft = padX + 64;
+            const stripRight = padX + 64 + rowGlyphs.length * 54;
+            const cx = (stripLeft + stripRight) / 2;
+            const cy = ry + (rowH - 10) / 2;
+            ctx.translate(cx, cy);
+            ctx.rotate(Math.PI);
+            ctx.translate(-cx, -cy);
+          }
+
+          rowGlyphs.forEach(function (code, cIdx) {
+            const gx = padX + 64 + cIdx * 54;
+            const gy = ry + 6;
+            const def = getGlyphDef(code);
+
+            ctx.save();
+            ctx.translate(gx, gy);
+            ctx.scale(0.82, 0.85);
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            def.paths.forEach(function (d) {
+              const p = new Path2D(d);
+              ctx.save();
+              ctx.translate(-1.5, -1.5);
+              ctx.strokeStyle = "rgba(10, 4, 1, 0.9)";
+              ctx.lineWidth = 3.6;
+              ctx.stroke(p);
+              ctx.restore();
+
+              ctx.strokeStyle = theme.stroke;
+              ctx.lineWidth = 3.1;
+              ctx.stroke(p);
+            });
+
+            ctx.restore();
+          });
+
+          ctx.restore();
+        });
+
+        ctx.restore();
+
+        // Подпись музейной этикетки внизу
+        ctx.fillStyle = "#b7a48c";
+        ctx.font = "13px Georgia, serif";
+        ctx.fillText(
+          "KOHAU RONGORONGO · Boustrophédon inverse : " +
+            (state.boustrophedon ? "Activé" : "Désactivé") +
+            " · Total des signes : " +
+            state.rows.reduce(function (a, b) {
+              return a + b.length;
+            }, 0),
+          28,
+          height - 13
+        );
+
+        const link = document.createElement("a");
+        link.download = "kohau-rongorongo.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      /* =====================================================================
+         10. КАТАЛОГ БАРТЕЛЯ И КОНСТРУКТОР ЛИГАТУР
+         ===================================================================== */
+      const glyphGridEl = document.getElementById("glyphGrid");
+
+      function renderCatalog() {
+        glyphGridEl.innerHTML = "";
+        const q = state.catalogQuery.trim().toLowerCase();
+
+        const codesToShow = GLYPH_ORDER.concat(Object.keys(CUSTOM_GLYPHS));
+        codesToShow.forEach(function (code) {
+          const def = getGlyphDef(code);
+          if (state.catalogCategory !== "all" && def.cat !== state.catalogCategory) {
+            return;
+          }
+          if (q) {
+            const hay = (code + " " + def.rapa + " " + def.ru + " " + (def.keywords || []).join(" ")).toLowerCase();
+            if (hay.indexOf(q) === -1) return;
+          }
+
+          const card = document.createElement("div");
+          card.className = "glyph-card";
+          card.innerHTML =
+            '<div class="glyph-card-top">' +
+              "<span>" + (code.indexOf("-") > -1 ? code : "B-" + code) + "</span>" +
+              "<span>+ graver</span>" +
+            "</div>" +
+            '<div class="glyph-card-art">' +
+              createGlyphSvgMarkup(code, "glyph-preview-svg") +
+            "</div>" +
+            '<div class="glyph-card-rapa">' + def.rapa + "</div>" +
+            '<div class="glyph-card-ru">' + def.ru + "</div>";
+
+          card.addEventListener("click", function () {
+            carveGlyphToTablet(code);
+          });
+
+          glyphGridEl.appendChild(card);
+        });
+      }
+
+      function updateLigaturePreview() {
+        const baseId = document.getElementById("ligBaseSelect").value;
+        const headId = document.getElementById("ligHeadSelect").value;
+        const handId = document.getElementById("ligHandSelect").value;
+
+        const ligDef = buildLigatureDefinition(baseId, headId, handId);
+        CUSTOM_GLYPHS[ligDef.code] = ligDef;
+
+        document.getElementById("ligaturePreviewWrap").innerHTML = createGlyphSvgMarkup(
+          ligDef.code,
+          "glyph-preview-svg"
+        );
+        document.getElementById("ligatureCodeTag").textContent = ligDef.code;
+        return ligDef;
+      }
+
+      /* =====================================================================
+         11. ДОСКА ГРАВИРОВКИ ОБСИДИАНОМ МАТА'А И АКУЛЬИМ ЗУБОМ (<canvas>)
+         ===================================================================== */
+      const obsCanvas = document.getElementById("obsidianCanvas");
+      const obsCtx = obsCanvas.getContext("2d");
+      const carverState = {
+        drawing: false,
+        tool: "shark",
+        symmetry: false,
+        strokes: [
+          {
+            tool: "shark",
+            symmetry: false,
+            points: [
+              { x: 74, y: 155 }, { x: 92, y: 215 }, { x: 128, y: 252 },
+              { x: 160, y: 262 }, { x: 192, y: 252 }, { x: 228, y: 215 }, { x: 246, y: 155 }
+            ]
+          },
+          {
+            tool: "obsidian",
+            symmetry: false,
+            points: [
+              { x: 74, y: 155 }, { x: 118, y: 192 }, { x: 160, y: 202 },
+              { x: 202, y: 192 }, { x: 246, y: 155 }
+            ]
+          },
+          {
+            tool: "obsidian",
+            symmetry: true,
+            points: [
+              { x: 160, y: 92 }, { x: 136, y: 122 }, { x: 160, y: 152 }
+            ]
+          }
+        ],
+        currentStroke: null
+      };
+
+      function redrawObsidianCanvas() {
+        const w = obsCanvas.width;
+        const h = obsCanvas.height;
+
+        // Деревянный брусок торомиро
+        const bgGrad = obsCtx.createLinearGradient(0, 0, w, h);
+        bgGrad.addColorStop(0, "#4c2512");
+        bgGrad.addColorStop(0.5, "#67341b");
+        bgGrad.addColorStop(1, "#3b1b0c");
+        obsCtx.fillStyle = bgGrad;
+        obsCtx.fillRect(0, 0, w, h);
+
+        // Текстура волокон
+        for (let y = 4; y < h; y += 6) {
+          obsCtx.strokeStyle = y % 12 === 0 ? "rgba(18, 7, 2, 0.25)" : "rgba(255, 215, 175, 0.05)";
+          obsCtx.lineWidth = 1.2;
+          obsCtx.beginPath();
+          obsCtx.moveTo(0, y);
+          obsCtx.lineTo(w, y + ((y % 18) - 9) * 0.25);
+          obsCtx.stroke();
+        }
+
+        // Разметочная рамка канона пропорций глифа
+        obsCtx.strokeStyle = "rgba(255, 224, 185, 0.12)";
+        obsCtx.setLineDash([5, 5]);
+        obsCtx.strokeRect(36, 36, w - 72, h - 72);
+        if (carverState.symmetry) {
+          obsCtx.strokeStyle = "rgba(78, 181, 166, 0.42)";
+          obsCtx.beginPath();
+          obsCtx.moveTo(w / 2, 20);
+          obsCtx.lineTo(w / 2, h - 20);
+          obsCtx.stroke();
+        }
+        obsCtx.setLineDash([]);
+
+        // Отрисовка всех вырезанных борозд
+        const allStrokes = carverState.currentStroke
+          ? carverState.strokes.concat([carverState.currentStroke])
+          : carverState.strokes;
+
+        allStrokes.forEach(function (st) {
+          drawSingleCarvedStroke(st.points, st.tool, false);
+          if (st.symmetry) {
+            const mirrored = st.points.map(function (pt) {
+              return { x: w - pt.x, y: pt.y };
+            });
+            drawSingleCarvedStroke(mirrored, st.tool, false);
+          }
+        });
+      }
+
+      function drawSingleCarvedStroke(pts, tool, isOffset) {
+        if (!pts || pts.length < 2) return;
+
+        if (tool === "double" && !isOffset) {
+          const leftPts = pts.map(function (p) {
+            return { x: p.x - 4.5, y: p.y };
+          });
+          const rightPts = pts.map(function (p) {
+            return { x: p.x + 4.5, y: p.y };
+          });
+          drawSingleCarvedStroke(leftPts, "obsidian", true);
+          drawSingleCarvedStroke(rightPts, "obsidian", true);
+          return;
+        }
+
+        const lineW = tool === "shark" ? 8.5 : 3.8;
+        obsCtx.lineCap = "round";
+        obsCtx.lineJoin = "round";
+
+        // Глубокая тень реза
+        obsCtx.save();
+        obsCtx.translate(-1.8, -1.8);
+        obsCtx.strokeStyle = "rgba(12, 4, 1, 0.9)";
+        obsCtx.lineWidth = lineW + 1.4;
+        tracePolyline(obsCtx, pts);
+        obsCtx.stroke();
+        obsCtx.restore();
+
+        // Светлая сердцевина древесного среза
+        obsCtx.strokeStyle = tool === "shark" ? "#f5dec1" : "#ebd0ae";
+        obsCtx.lineWidth = lineW;
+        tracePolyline(obsCtx, pts);
+        obsCtx.stroke();
+      }
+
+      function tracePolyline(ctx, pts) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+          ctx.lineTo(pts[i].x, pts[i].y);
+        }
+      }
+
+      function getCanvasPoint(ev) {
+        const rect = obsCanvas.getBoundingClientRect();
+        const scaleX = obsCanvas.width / rect.width;
+        const scaleY = obsCanvas.height / rect.height;
+        return {
+          x: (ev.clientX - rect.left) * scaleX,
+          y: (ev.clientY - rect.top) * scaleY
+        };
+      }
+
+      obsCanvas.addEventListener("pointerdown", function (ev) {
+        ev.preventDefault();
+        obsCanvas.setPointerCapture(ev.pointerId);
+        carverState.drawing = true;
+        const pt = getCanvasPoint(ev);
+        carverState.currentStroke = {
+          tool: carverState.tool,
+          symmetry: carverState.symmetry,
+          points: [pt]
+        };
+        playWoodSound("carve");
+        redrawObsidianCanvas();
+      });
+
+      obsCanvas.addEventListener("pointermove", function (ev) {
+        if (!carverState.drawing || !carverState.currentStroke) return;
+        const pt = getCanvasPoint(ev);
+        const pts = carverState.currentStroke.points;
+        const prev = pts[pts.length - 1];
+        const dist = Math.hypot(pt.x - prev.x, pt.y - prev.y);
+        if (dist >= 4.5) {
+          pts.push(pt);
+          redrawObsidianCanvas();
+        }
+      });
+
+      function finishCarvingStroke() {
+        if (!carverState.drawing) return;
+        carverState.drawing = false;
+        if (carverState.currentStroke && carverState.currentStroke.points.length > 1) {
+          carverState.strokes.push(carverState.currentStroke);
+        }
+        carverState.currentStroke = null;
+        redrawObsidianCanvas();
+      }
+
+      obsCanvas.addEventListener("pointerup", finishCarvingStroke);
+      obsCanvas.addEventListener("pointercancel", finishCarvingStroke);
+
+      function convertCanvasStrokesToGlyph() {
+        if (carverState.strokes.length === 0) {
+          document.getElementById("carverStatusNote").textContent =
+            "Gravez d’abord au moins un contour sur le bloc de bois à gauche, à la souris ou au doigt !";
+          return;
+        }
+
+        const w = obsCanvas.width;
+        const h = obsCanvas.height;
+        const paths = [];
+
+        function ptsToSvgPath(pts, dx) {
+          return pts
+            .map(function (p, idx) {
+              const sx = (((p.x + (dx || 0)) / w) * 56 + 4).toFixed(1);
+              const sy = ((p.y / h) * 70 + 5).toFixed(1);
+              return (idx === 0 ? "M" : "L") + sx + " " + sy;
+            })
+            .join(" ");
+        }
+
+        carverState.strokes.forEach(function (st) {
+          if (st.tool === "double") {
+            paths.push(ptsToSvgPath(st.points, -4));
+            paths.push(ptsToSvgPath(st.points, 4));
+          } else {
+            paths.push(ptsToSvgPath(st.points, 0));
+          }
+          if (st.symmetry) {
+            const mir = st.points.map(function (p) {
+              return { x: w - p.x, y: p.y };
+            });
+            if (st.tool === "double") {
+              paths.push(ptsToSvgPath(mir, -4));
+              paths.push(ptsToSvgPath(mir, 4));
+            } else {
+              paths.push(ptsToSvgPath(mir, 0));
+            }
+          }
+        });
+
+        const code = "U-0" + state.customCounter++;
+        CUSTOM_GLYPHS[code] = {
+          code: code,
+          cat: "ideo",
+          rapa: "Kohau " + code,
+          ru: "Signe gravé original",
+          keywords: [],
+          desc: "Signe original de l’utilisateur, gravé à la main dans l’atelier de gravure à l’obsidienne Mata'a et numérisé dans le corpus vectoriel.",
+          paths: paths
+        };
+
+        renderCatalog();
+        carveGlyphToTablet(code);
+        document.getElementById("carverStatusNote").textContent =
+          "Le signe " + code + " a été ajouté au catalogue et gravé sur la tablette Kohau principale ! Vérifiez sa rotation de 180° dans la section du haut.";
+        document.getElementById("studio").scrollIntoView({ behavior: "smooth" });
+      }
+
+      /* =====================================================================
+         12. НАУЧНЫЕ ВКЛАДКИ И ЖИВАЯ СТАТИСТИКА ТАБЛИЧКИ
+         ===================================================================== */
+      function initScienceModules() {
+        // 1. Матрица параллелей Кудрявцева (Кунсткамера)
+        const matrixEl = document.getElementById("parallelMatrix");
+        const commEl = document.getElementById("parallelCommentary");
+        const cols = KUNSTKAMERA_PARALLELS.columns;
+
+        const rowsMeta = [
+          { key: "p", title: "Tablette P", sub: "Kunstkamera, Saint-Pétersbourg" },
+          { key: "q", title: "Tablette Q", sub: "Kunstkamera, Saint-Pétersbourg" },
+          { key: "h", title: "Tablette H", sub: "Santiago, Chili" }
+        ];
+
+        rowsMeta.forEach(function (rm) {
+          const rDiv = document.createElement("div");
+          rDiv.className = "parallel-row";
+
+          const lbl = document.createElement("div");
+          lbl.className = "parallel-tablet-label";
+          lbl.innerHTML = rm.title + "<span>" + rm.sub + "</span>";
+          rDiv.appendChild(lbl);
+
+          cols.forEach(function (colObj, colIdx) {
+            const slot = document.createElement("div");
+            slot.className = "parallel-slot";
+            slot.dataset.col = String(colIdx);
+            const gCode = colObj[rm.key];
+            slot.innerHTML = createGlyphSvgMarkup(gCode, "glyph-preview-svg");
+            slot.title = "B-" + gCode + " · " + getGlyphDef(gCode).ru;
+            slot.addEventListener("click", function () {
+              selectParallelColumn(colIdx);
+              playWoodSound("chant");
+            });
+            rDiv.appendChild(slot);
+          });
+
+          matrixEl.appendChild(rDiv);
+        });
+
+        function selectParallelColumn(activeCol) {
+          matrixEl.querySelectorAll(".parallel-slot").forEach(function (el) {
+            el.classList.toggle("highlight", Number(el.dataset.col) === activeCol);
+          });
+          commEl.textContent = cols[activeCol].note;
+        }
+        selectParallelColumn(0);
+
+        // 2. Лунный календарь Мамари
+        const mamariStripEl = document.getElementById("mamariStrip");
+        const mamariCommEl = document.getElementById("mamariCommentary");
+
+        MAMARI_PHASES.forEach(function (ph, idx) {
+          const cell = document.createElement("div");
+          cell.className = "lunar-cell" + (idx === 5 ? " active" : "");
+          cell.innerHTML =
+            '<span class="lunar-night">' + ph.night + "</span>" +
+            createGlyphSvgMarkup(ph.glyph, "glyph-preview-svg") +
+            '<span class="lunar-name">' + ph.name + "</span>";
+
+          cell.addEventListener("click", function () {
+            mamariStripEl.querySelectorAll(".lunar-cell").forEach(function (c) {
+              c.classList.remove("active");
+            });
+            cell.classList.add("active");
+            mamariCommEl.textContent = ph.info;
+            playWoodSound("chant");
+          });
+
+          mamariStripEl.appendChild(cell);
+        });
+        mamariCommEl.textContent = MAMARI_PHASES[5].info;
+
+        // 3. Космогонические триады Посоха Сантьяго
+        const triadsWrap = document.getElementById("triadsShowcase");
+        SANTIAGO_TRIADS.forEach(function (tr) {
+          const card = document.createElement("div");
+          card.style.background = "var(--bg-card)";
+          card.style.border = "1px solid var(--border-subtle)";
+          card.style.borderRadius = "12px";
+          card.style.padding = "14px";
+
+          const glyphRow = document.createElement("div");
+          glyphRow.style.display = "flex";
+          glyphRow.style.alignItems = "center";
+          glyphRow.style.justifyContent = "space-between";
+          glyphRow.style.flexWrap = "wrap";
+          glyphRow.style.gap = "10px";
+
+          const icons = document.createElement("div");
+          icons.style.display = "flex";
+          icons.style.gap = "8px";
+          tr.signs.forEach(function (sCode) {
+            const box = document.createElement("div");
+            box.style.width = "46px";
+            box.style.height = "58px";
+            box.style.padding = "4px";
+            box.style.borderRadius = "8px";
+            box.style.background = "linear-gradient(180deg, #522915, #32180b)";
+            box.style.border = "1px solid rgba(232,171,76,0.28)";
+            box.innerHTML = createGlyphSvgMarkup(sCode, "glyph-preview-svg");
+            icons.appendChild(box);
+          });
+
+          const loadBtn = document.createElement("button");
+          loadBtn.type = "button";
+          loadBtn.className = "btn-amber";
+          loadBtn.textContent = "+ Graver la triade sur la tablette";
+          loadBtn.addEventListener("click", function () {
+            tr.signs.forEach(function (sCode) {
+              carveGlyphToTablet(sCode);
+            });
+            document.getElementById("studio").scrollIntoView({ behavior: "smooth" });
+          });
+
+          glyphRow.appendChild(icons);
+          glyphRow.appendChild(loadBtn);
+
+          const titleP = document.createElement("div");
+          titleP.style.fontWeight = "700";
+          titleP.style.marginTop = "10px";
+          titleP.style.fontSize = "14px";
+          titleP.style.color = "var(--accent-amber)";
+          titleP.textContent = tr.formula;
+
+          const descP = document.createElement("p");
+          descP.style.fontSize = "13px";
+          descP.style.color = "var(--text-muted)";
+          descP.style.marginTop = "4px";
+          descP.textContent = tr.desc;
+
+          card.appendChild(glyphRow);
+          card.appendChild(titleP);
+          card.appendChild(descP);
+          triadsWrap.appendChild(card);
+        });
+      }
+
+      function updateLiveStatistics() {
+        const flat = [];
+        state.rows.forEach(function (r) {
+          r.forEach(function (g) {
+            flat.push(g);
+          });
+        });
+
+        const total = flat.length;
+        const counts = {};
+        flat.forEach(function (g) {
+          counts[g] = (counts[g] || 0) + 1;
+        });
+        const uniqueKeys = Object.keys(counts);
+        const diversity = total > 0 ? Math.round((uniqueKeys.length / total) * 100) : 0;
+
+        document.getElementById("statTotal").textContent = String(total);
+        document.getElementById("statUnique").textContent = String(uniqueKeys.length);
+        document.getElementById("statDiversity").textContent = diversity + "%";
+
+        const sorted = uniqueKeys
+          .sort(function (a, b) {
+            return counts[b] - counts[a];
+          })
+          .slice(0, 6);
+
+        const freqListEl = document.getElementById("freqList");
+        freqListEl.innerHTML = "";
+        const maxCount = sorted.length ? counts[sorted[0]] : 1;
+
+        sorted.forEach(function (code) {
+          const pct = Math.round((counts[code] / maxCount) * 100);
+          const item = document.createElement("div");
+          item.className = "freq-item";
+          item.innerHTML =
+            '<span style="font-family:var(--font-mono); color:var(--accent-amber);">' +
+              (code.indexOf("-") > -1 ? code : "B-" + code) +
+            "</span>" +
+            '<div class="freq-bar-bg"><div class="freq-bar-fill" style="width:' + pct + '%"></div></div>' +
+            '<span style="text-align:right; color:var(--text-muted);">' + counts[code] + "×</span>";
+          freqListEl.appendChild(item);
+        });
+
+        // Поиск самой частой биграммы (устойчивой формулы из 2 знаков подряд)
+        const bigrams = {};
+        for (let i = 0; i < flat.length - 1; i++) {
+          const pair = flat[i] + " → " + flat[i + 1];
+          bigrams[pair] = (bigrams[pair] || 0) + 1;
+        }
+        let bestPair = null;
+        let bestPairCount = 0;
+        Object.keys(bigrams).forEach(function (p) {
+          if (bigrams[p] > bestPairCount) {
+            bestPairCount = bigrams[p];
+            bestPair = p;
+          }
+        });
+
+        const bigramEl = document.getElementById("bigramReport");
+        if (bestPair && bestPairCount > 1) {
+          bigramEl.textContent =
+            "Formule épigraphique répétée détectée (bigramme) : [" +
+            bestPair +
+            "] — rencontrée " +
+            bestPairCount +
+            " fois sur la tablette actuelle.";
+        } else {
+          bigramEl.textContent =
+            "Le corpus canonique du rongorongo se caractérise par une faible entropie et de fréquentes répétitions formulaïques de paires de signes.";
+        }
+      }
+
+      /* =====================================================================
+         13. ПРИВЯЗКА СОБЫТИЙ ИНТЕРФЕЙСА И ЗАПУСК
+         ===================================================================== */
+      function bindUIEvents() {
+        // Переключатель звука
+        const soundBtn = document.getElementById("soundToggleBtn");
+        soundBtn.addEventListener("click", function () {
+          soundEnabled = !soundEnabled;
+          soundBtn.textContent = "Son du burin : " + (soundEnabled ? "Activé" : "Désactivé");
+          soundBtn.classList.toggle("active", soundEnabled);
+          if (soundEnabled) playWoodSound("chant");
+        });
+
+        // Выбор исторического памятника
+        document.getElementById("presetSelect").addEventListener("change", function (ev) {
+          loadPreset(ev.target.value);
+          playWoodSound("flip");
+        });
+
+        // Порода древесины
+        document.getElementById("woodSelect").addEventListener("change", function (ev) {
+          const theme = WOOD_THEMES[ev.target.value] || WOOD_THEMES.toromiro;
+          const root = document.documentElement.style;
+          root.setProperty("--wood-base", theme.base);
+          root.setProperty("--wood-mid", theme.mid);
+          root.setProperty("--wood-dark", theme.dark);
+          root.setProperty("--glyph-stroke", theme.stroke);
+          playWoodSound("flip");
+        });
+
+        // Обратный бустрофедон
+        const boustroBtn = document.getElementById("boustroToggleBtn");
+        boustroBtn.addEventListener("click", function () {
+          state.boustrophedon = !state.boustrophedon;
+          boustroBtn.textContent =
+            "Boustrophédon inverse : " + (state.boustrophedon ? "Activé" : "Désactivé");
+          boustroBtn.classList.toggle("active", state.boustrophedon);
+          playWoodSound("flip");
+          renderTablet();
+        });
+
+        // Поворот дощечки на 180°
+        document.getElementById("rotateTabletBtn").addEventListener("click", function () {
+          toggleTabletRotation();
+        });
+
+        // Чтение жреца и пошаговый переход
+        document.getElementById("chanterPlayBtn").addEventListener("click", toggleChanterPlay);
+        document.getElementById("chanterStepBtn").addEventListener("click", function () {
+          stopChanter();
+          stepChanter();
+        });
+
+        // Ползунок косого эпиграфического света (RTI)
+        const lightSlider = document.getElementById("lightAngleSlider");
+        const lightValEl = document.getElementById("lightAngleVal");
+        lightSlider.addEventListener("input", function () {
+          const deg = Number(lightSlider.value);
+          lightValEl.textContent = deg + "°";
+          const rad = (deg * Math.PI) / 180;
+          const dist = 2.3;
+          const lx = (Math.cos(rad) * dist).toFixed(2) + "px";
+          const ly = (Math.sin(rad) * dist).toFixed(2) + "px";
+          const nlx = (-Math.cos(rad) * 1.65).toFixed(2) + "px";
+          const nly = (-Math.sin(rad) * 1.65).toFixed(2) + "px";
+          const root = document.documentElement.style;
+          root.setProperty("--lx", lx);
+          root.setProperty("--ly", ly);
+          root.setProperty("--nlx", nlx);
+          root.setProperty("--nly", nly);
+        });
+
+        // Редактирование канелюр
+        document.getElementById("newRowBtn").addEventListener("click", function () {
+          stopChanter();
+          state.rows.push([]);
+          state.activeRow = state.rows.length - 1;
+          playWoodSound("flip");
+          renderTablet();
+        });
+
+        document.getElementById("backspaceBtn").addEventListener("click", function () {
+          stopChanter();
+          const row = state.rows[state.activeRow];
+          if (row && row.length > 0) {
+            if (
+              state.selectedPos &&
+              state.selectedPos.row === state.activeRow &&
+              state.selectedPos.col < row.length
+            ) {
+              row.splice(state.selectedPos.col, 1);
+              state.selectedPos.col = Math.max(0, state.selectedPos.col - 1);
+            } else {
+              row.pop();
+            }
+            playWoodSound("carve");
+            renderTablet();
+          } else if (state.rows.length > 1) {
+            state.rows.splice(state.activeRow, 1);
+            state.activeRow = Math.max(0, state.activeRow - 1);
+            renderTablet();
+          }
+        });
+
+        document.getElementById("clearTabletBtn").addEventListener("click", function () {
+          stopChanter();
+          state.rows = [[], []];
+          state.activeRow = 0;
+          state.selectedPos = null;
+          state.chanterCursor = { row: 0, col: -1 };
+          toggleTabletRotation(false);
+          playWoodSound("flip");
+          renderTablet();
+        });
+
+        document.getElementById("exportPngBtn").addEventListener("click", exportTabletToPng);
+
+        // Транскриптор фраз
+        const phraseInput = document.getElementById("phraseInput");
+        document.getElementById("transcribeBtn").addEventListener("click", function () {
+          transcribePhraseToTablet(phraseInput.value);
+        });
+        phraseInput.addEventListener("keydown", function (ev) {
+          if (ev.key === "Enter") transcribePhraseToTablet(phraseInput.value);
+        });
+        document.querySelectorAll(".chip[data-sample]").forEach(function (chip) {
+          chip.addEventListener("click", function () {
+            phraseInput.value = chip.dataset.sample;
+            transcribePhraseToTablet(phraseInput.value);
+          });
+        });
+
+        // Фильтры каталога Бартеля
+        document.querySelectorAll("#catPills .cat-pill").forEach(function (pill) {
+          pill.addEventListener("click", function () {
+            document.querySelectorAll("#catPills .cat-pill").forEach(function (p) {
+              p.classList.remove("active");
+            });
+            pill.classList.add("active");
+            state.catalogCategory = pill.dataset.cat;
+            renderCatalog();
+          });
+        });
+
+        document.getElementById("catalogSearch").addEventListener("input", function (ev) {
+          state.catalogQuery = ev.target.value;
+          renderCatalog();
+        });
+
+        // Constructeur de ligatures
+        ["ligBaseSelect", "ligHeadSelect", "ligHandSelect"].forEach(function (id) {
+          document.getElementById(id).addEventListener("change", function () {
+            updateLigaturePreview();
+            playWoodSound("chant");
+          });
+        });
+
+        document.getElementById("insertLigatureBtn").addEventListener("click", function () {
+          const lig = updateLigaturePreview();
+          renderCatalog();
+          carveGlyphToTablet(lig.code);
+          inspectGlyphByCode(lig.code, "Ligature synthétisée gravée sur la tablette");
+        });
+
+        // Инструменты резчика по обсидиану
+        document.querySelectorAll("#carverTools .tool-card").forEach(function (card) {
+          card.addEventListener("click", function () {
+            document.querySelectorAll("#carverTools .tool-card").forEach(function (c) {
+              c.classList.remove("active");
+            });
+            card.classList.add("active");
+            carverState.tool = card.dataset.tool;
+            playWoodSound("chant");
+          });
+        });
+
+        const symBtn = document.getElementById("symmetryToggleBtn");
+        symBtn.addEventListener("click", function () {
+          carverState.symmetry = !carverState.symmetry;
+          symBtn.textContent = "Axe de symétrie : " + (carverState.symmetry ? "Activé" : "Désactivé");
+          symBtn.classList.toggle("active", carverState.symmetry);
+          redrawObsidianCanvas();
+        });
+
+        document.getElementById("undoStrokeBtn").addEventListener("click", function () {
+          carverState.strokes.pop();
+          redrawObsidianCanvas();
+        });
+
+        document.getElementById("clearCanvasBtn").addEventListener("click", function () {
+          carverState.strokes = [];
+          redrawObsidianCanvas();
+        });
+
+        document.getElementById("addCustomGlyphBtn").addEventListener("click", convertCanvasStrokesToGlyph);
+
+        // Переключение научных вкладок
+        document.querySelectorAll("#scienceTabs .tab-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            document.querySelectorAll("#scienceTabs .tab-btn").forEach(function (b) {
+              b.classList.remove("active");
+            });
+            document.querySelectorAll(".tab-pane").forEach(function (pane) {
+              pane.classList.remove("active");
+            });
+            btn.classList.add("active");
+            const target = document.getElementById(btn.dataset.tab);
+            if (target) target.classList.add("active");
+            playWoodSound("chant");
+          });
+        });
+      }
+
+      // Инициализация всей лаборатории Ронго-ронго
+      bindUIEvents();
+      updateLigaturePreview();
+      renderCatalog();
+      redrawObsidianCanvas();
+      initScienceModules();
+      loadPreset("mamari");
+    })();
+  </script>
+</body>
+</html>
